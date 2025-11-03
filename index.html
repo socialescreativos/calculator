@@ -5,79 +5,189 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Calculadora de Empleabilidad</title>
   <style>
+    /* Definición de variables CSS */
     :root {
-      --bg: #0b0d10;
-      --card: #151922;
-      --muted: #a8b3cf;
-      --text: #e7ecf7;
-      --ok: #22c55e; --warn:#f59e0b; --bad:#ef4444; --brand:#7aa2ff;
-      --border: #2a3040; --shadow: 0 10px 30px rgba(0,0,0,.35); --radius:16px;
+      --bg: #0b0d10; /* Fondo principal muy oscuro */
+      --card: #151922; /* Fondo de las tarjetas, un poco más claro que el fondo */
+      --muted: #a8b3cf; /* Texto secundario gris claro */
+      --text: #e7ecf7; /* Texto principal blanco/azul muy claro */
+      --ok: #22c55e; /* Verde brillante */
+      --warn: #f59e0b; /* Amarillo/Naranja de alerta */
+      --bad: #ef4444; /* Rojo de peligro */
+      --brand: #7aa2ff; /* Azul de marca */
+      --border: #2a3040; /* Bordes sutiles y oscuros */
+      --shadow: 0 12px 40px rgba(0,0,0,.45); /* Sombra más profunda */
+      --radius: 18px; /* Bordes más redondeados */
+      --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
     }
+    
+    /* Importar fuente Inter desde Google Fonts (mejor aspecto) */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
     html,body{height:100%}
-    body{margin:0;background: radial-gradient(1200px 800px at 80% -10%, #1b2231 0%, var(--bg) 60%);color:var(--text);font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";line-height:1.35}
+    body{
+      margin:0;
+      background: radial-gradient(1200px 800px at 80% -10%, #1b2231 0%, var(--bg) 60%);
+      color:var(--text);
+      font-family: var(--font-sans);
+      line-height:1.5; /* Mejor legibilidad */
+    }
     .container{max-width:1100px;margin:32px auto;padding:0 16px}
-    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:18px}
-    h1{font-size:clamp(22px,2.6vw,32px);margin:0;letter-spacing:.3px}
-    .row{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
-    @media(max-width:900px){.row{grid-template-columns:1fr}}
-    .card{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 60%),var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
-    .card>.card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)}
-    .card>.card-body{padding:18px}
-    .controls{display:flex;gap:8px;flex-wrap:wrap}
-    button{appearance:none;border:1px solid var(--border);background:#0f1420;color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:600;transition:.2s transform,.2s background}
-    button:hover{background:#121a2a} button:active{transform:translateY(1px)}
-    fieldset{border:1px solid var(--border);border-radius:14px;padding:14px;margin:0 0 14px 0}
-    legend{padding:0 8px;color:var(--muted);font-size:12px;letter-spacing:.6px}
-    .grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    .grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:24px}
+    h1{font-size:clamp(24px,2.8vw,36px);margin:0;letter-spacing:.5px;font-weight:700;}
+    h2{font-size:18px;font-weight:600;margin:0 0 10px 0;}
+    .row{display:grid;grid-template-columns:1.2fr .8fr;gap:24px}
+    @media(max-width:900px){.row{grid-template-columns:1fr; gap:16px;}}
+    
+    /* Mejoras en la tarjeta (Card) */
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.03) 0%,var(--card) 40%); /* Degradado sutil para darle profundidad */
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .card>.card-header{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:18px 20px;
+      border-bottom:1px solid var(--border);
+      font-size:1.1em;
+    }
+    .card>.card-body{padding:20px}
+    
+    /* Controles y Botones */
+    .controls{display:flex;gap:10px;flex-wrap:wrap}
+    button{
+      appearance:none;border:none; /* Eliminamos el borde */
+      background:var(--brand);
+      color:var(--bg); /* Texto oscuro sobre el botón de marca */
+      padding:10px 18px;
+      border-radius:12px;
+      cursor:pointer;font-weight:600;
+      transition:.2s transform,.2s background,.2s box-shadow;
+      font-size:14px;
+    }
+    button#btnReset { background:#444; color:var(--text); }
+    button#btnReset:hover { background:#666; }
+
+    button:hover{background:var(--brand); box-shadow:0 0 10px rgba(122, 162, 255, 0.4);}
+    button:active{transform:translateY(1px); box-shadow:none;}
+    
+    /* Formularios e Inputs */
+    fieldset{border:1px solid var(--border);border-radius:14px;padding:16px;margin:0 0 18px 0}
+    legend{padding:0 8px;color:var(--muted);font-size:12px;letter-spacing:.8px;font-weight:600;}
+    .grid-2,.grid-3{display:grid;gap:16px}
+    .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
     @media(max-width:700px){.grid-2,.grid-3{grid-template-columns:1fr}}
-    label{display:block;font-size:13px;color:#cdd6ea;margin-bottom:6px}
-    input[type="range"]{width:100%}
-    input,select,textarea{width:100%;box-sizing:border-box;background:#0c111b;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px}
-    textarea{min-height:80px;resize:vertical}
-    .hint{color:var(--muted);font-size:12px}
-    .score-wrap{display:grid;gap:14px}
-    .score{background:conic-gradient(var(--ok) var(--angle,0deg),#233144 0deg);border-radius:20px;padding:16px;position:relative;overflow:hidden}
-    .score-inner{background:var(--card);border:1px dashed var(--border);border-radius:14px;padding:14px;text-align:center}
-    .score h2{margin:0;font-size:22px}
-    .big{font-size:46px;font-weight:800;letter-spacing:.5px}
-    .meter{height:10px;background:#1b2434;border-radius:999px;overflow:hidden;border:1px solid var(--border)}
-    .meter>div{height:100%;width:0%;background:linear-gradient(90deg,var(--bad),var(--warn),var(--ok));transition:width .4s ease}
+    label{display:block;font-size:14px;color:#cdd6ea;margin-bottom:8px;font-weight:500;}
+    
+    input[type="range"]{width:100%; height:4px; margin-top:10px; /* Ajuste visual del slider */}
+    input,select,textarea{
+      width:100%;box-sizing:border-box;
+      background:#0c111b; /* Fondo input más oscuro */
+      color:var(--text);
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:12px; /* Aumentamos padding para hacerlos más altos */
+      transition:border-color .2s;
+    }
+    input:focus,select:focus,textarea:focus{border-color:var(--brand);outline:none;}
+    textarea{min-height:100px;resize:vertical}
+    .hint{color:var(--muted);font-size:11px;margin-top:4px;}
+    
+    /* Score y Visualización */
+    .score-wrap{display:grid;gap:18px}
+    .score{
+      background:conic-gradient(var(--ok) var(--angle,0deg),#233144 0deg);
+      border-radius:24px;
+      padding:20px;
+      position:relative;overflow:hidden;
+    }
+    .score-inner{
+      background:var(--card);
+      border:1px dashed var(--border);
+      border-radius:18px;
+      padding:20px;
+      text-align:center;
+    }
+    .score h2{margin:0;font-size:20px; font-weight:700;}
+    .big{font-size:52px;font-weight:900;letter-spacing:1px; margin: 4px 0 8px 0;}
+    .meter{height:12px;background:#1b2434;border-radius:999px;overflow:hidden;border:1px solid var(--border); margin-top:10px;}
+    .meter>div{height:100%;width:0%;background:linear-gradient(90deg,var(--bad),var(--warn),var(--ok));transition:width .6s ease}
+    
+    .pill{
+      font-size:12px; font-weight:700; padding:4px 10px; border-radius:12px;
+      text-transform:uppercase;
+    }
+    .pill.bad{background:rgba(239, 68, 68, 0.2); color:var(--bad);} 
+    .pill.warn{background:rgba(245, 158, 11, 0.2); color:var(--warn);} 
+    .pill.ok{background:rgba(34, 197, 94, 0.2); color:var(--ok);}
     .bad{color:var(--bad)} .warn{color:var(--warn)} .ok{color:var(--ok)}
-    .list{display:grid;gap:10px}
-    .list .item{display:flex;justify-content:space-between;gap:10px;border:1px solid var(--border);border-radius:12px;padding:10px 12px;background:#0f1522}
-    .item small{color:var(--muted)} .badge{font-weight:700}
-    .notice{padding:10px 12px;border:1px dashed var(--border);border-radius:12px;background:#0f1420;color:var(--muted);font-size:12px}
-    /* Tasks UI */
-    .tasks-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+
+    /* Desglose de Puntuación (List) */
+    .list{display:grid;gap:8px}
+    .list .item{
+      display:flex;justify-content:space-between;gap:10px;
+      border:1px solid var(--border);
+      border-radius:12px;padding:12px 14px;
+      background:#0f1522;
+      align-items:center;
+    }
+    .item small{color:var(--muted);font-size:11px;} 
+    .badge{font-weight:700; font-size:1.1em;}
+    
+    /* Tareas (Tasks UI) */
+    .tasks-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
     @media(max-width:900px){.tasks-grid{grid-template-columns:1fr}}
-    .task-card{background:#0f1420;border:1px solid var(--border);border-radius:14px;padding:12px;display:grid;gap:8px}
-    .task-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
-    .task-title{font-weight:700}
-    .chip{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border:1px solid var(--border);border-radius:999px;font-size:12px}
-    .chip.ok{border-color:#234e35;color:var(--ok)}
-    .chip.warn{border-color:#5a4302;color:var(--warn)}
-    .chip.bad{border-color:#5b1b1b;color:var(--bad)}
-    .task-meta{display:flex;flex-wrap:wrap;gap:8px;color:var(--muted);font-size:12px}
-    .task-kpi{font-size:12px;color:#cdd6ea}
-    .task-actions{display:flex;gap:8px;align-items:center}
-    .task-actions input[type='checkbox']{transform:scale(1.2)}
-    .divider{height:1px;background:var(--border);margin:6px 0}
+    .task-card{
+      background:var(--bg); /* Fondo más contrastado */
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:16px;
+      display:grid;gap:10px;
+      transition:border-color .2s;
+    }
+    .task-card:has(.task-done:checked){
+      border-color:var(--ok);
+      opacity:.8;
+    }
+    .chip{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:4px 10px; border:1px solid var(--border);
+      border-radius:999px;font-size:11px; font-weight:600;
+    }
+
     /* Modal */
     .modal-backdrop {
+      /* ... estilos del modal ... */
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.8);
       display: none; justify-content: center; align-items: center; z-index: 1000;
     }
     .modal {
-      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-      max-width: 500px; width: 90%; max-height: 90vh; display: flex; flex-direction: column;
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      max-width: 550px; width: 90%; max-height: 90vh; display: flex; flex-direction: column;
       box-shadow: var(--shadow);
     }
-    .modal .head { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; border-bottom: 1px solid var(--border); }
-    .modal .body { padding: 18px; overflow-y: auto; }
-    .modal .foot { display: flex; justify-content: flex-end; gap: 8px; padding: 16px 18px; border-top: 1px solid var(--border); }
+    .modal .head { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-bottom: 1px solid var(--border); font-weight: 700; font-size: 1.1em; }
+    .modal .head button { background: none; color: var(--muted); padding: 4px 8px; font-weight: normal; border-radius: 8px; }
+    .modal .body { padding: 20px; overflow-y: auto; }
+    .modal .foot { display: flex; justify-content: flex-end; gap: 10px; padding: 18px 20px; border-top: 1px solid var(--border); }
+    .modal .foot button { color: var(--text); background: #333; }
+    .modal .foot button#modalApply { background: var(--brand); color: var(--bg); }
+
     .checkgrid { display: grid; gap: 10px; }
-    .checkitem { display: flex; align-items: center; gap: 8px; font-size: 14px; background: #0c111b; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; }
+    .checkitem { 
+      display: flex; align-items: center; gap: 12px; font-size: 14px; 
+      background: #0f1420; padding: 12px; border-radius: 10px; 
+      border: 1px solid var(--border); cursor: pointer; 
+      transition: border-color .2s;
+    }
+    .checkitem input[type='checkbox'] { transform: scale(1.2); }
+    .checkitem:has(input:checked) {
+      border-color: var(--ok);
+      background: #1a2a22; /* Fondo sutilmente verde */
+    }
+
   </style>
 </head>
 <body>
@@ -161,7 +271,7 @@
                 <label for="digital">Competencia digital (0–10): <span id="digitalVal">5</span></label>
                 <div class="controls">
                   <input id="digital" type="range" min="0" max="10" step="1" value="5" />
-                  <button id="btnChecklistDigital" type="button">Checklist</button>
+                  <button id="btnChecklistDigital" type="button" style="background:#444; color:var(--text)">Checklist</button>
                 </div>
                 <div class="hint">Correo, Docs, hojas de cálculo, trámites online…</div>
               </div>
@@ -169,12 +279,12 @@
                 <label for="soft">Habilidades blandas (0–10): <span id="softVal">5</span></label>
                 <div class="controls">
                   <input id="soft" type="range" min="0" max="10" step="1" value="5" />
-                  <button id="btnChecklistSoft" type="button">Checklist</button>
+                  <button id="btnChecklistSoft" type="button" style="background:#444; color:var(--text)">Checklist</button>
                 </div>
                 <div class="hint">Comunicación, puntualidad, resolución, actitud.</div>
               </div>
             </div>
-            <div class="grid-2" style="margin-top:12px">
+            <div class="grid-2" style="margin-top:16px">
               <div>
                 <label for="lang">Idiomas</label>
                 <select id="lang">
@@ -202,7 +312,7 @@
                 <label for="comm">Conversación (0–10): <span id="commVal">5</span></label>
                 <div class="controls">
                   <input id="comm" type="range" min="0" max="10" step="1" value="5" />
-                  <button id="btnChecklistComm" type="button">Checklist</button>
+                  <button id="btnChecklistComm" type="button" style="background:#444; color:var(--text)">Checklist</button>
                 </div>
                 <div class="hint">Mantener turnos, escuchar, cerrar con claridad.</div>
               </div>
@@ -210,7 +320,7 @@
                 <label for="present">Presentación personal (0–10): <span id="presentVal">5</span></label>
                 <div class="controls">
                   <input id="present" type="range" min="0" max="10" step="1" value="5" />
-                  <button id="btnChecklistPresent" type="button">Checklist</button>
+                  <button id="btnChecklistPresent" type="button" style="background:#444; color:var(--text)">Checklist</button>
                 </div>
                 <div class="hint">Quién soy, qué aporto, ejemplo de logro en 30–45s.</div>
               </div>
@@ -218,7 +328,7 @@
                 <label for="tskill">Uso transporte público (0–10): <span id="tskillVal">5</span></label>
                 <div class="controls">
                   <input id="tskill" type="range" min="0" max="10" step="1" value="5" />
-                  <button id="btnChecklistTskill" type="button">Checklist</button>
+                  <button id="btnChecklistTskill" type="button" style="background:#444; color:var(--text)">Checklist</button>
                 </div>
                 <div class="hint">Rutas, transbordos, puntualidad en entrevistas.</div>
               </div>
@@ -232,7 +342,7 @@
                 <label for="admin">Trámites y servicios (0–10): <span id="adminVal">0</span></label>
                 <div class="controls">
                   <input id="admin" type="range" min="0" max="10" step="1" value="0" />
-                  <button id="btnChecklistBasics" type="button">Checklist</button>
+                  <button id="btnChecklistBasics" type="button" style="background:#444; color:var(--text)">Checklist</button>
                 </div>
                 <div class="hint">CV, Cl@ve Permanente, SEPE/SCE, carta de presentación.</div>
               </div>
@@ -281,7 +391,10 @@
       </section>
 
             <aside class="card" aria-labelledby="scoreTitle">
-        <div class="card-header"><strong id="scoreTitle">Resultado y prioridades de acción</strong><span class="pill" id="labelBand">–</span></div>
+        <div class="card-header">
+          <strong id="scoreTitle">Resultado y prioridades</strong>
+          <span class="pill" id="labelBand">–</span>
+        </div>
         <div class="card-body score-wrap">
           <div class="score" aria-live="polite">
             <div class="score-inner">
@@ -290,7 +403,6 @@
               <div class="meter" aria-hidden="true"><div id="meterBar"></div></div>
               <div class="subtitle" id="bandText">–</div>
             </div>
-            
           </div>
 
           <div class="list" id="breakdown" aria-live="polite"></div>
@@ -339,73 +451,18 @@
   </div>
 
   <script>
-  // ===== APP CORE: MEJORA DE FUNCIONALIDAD Y EVENTOS =====
+  // ===== APP CORE: FUNCIONALIDAD (SIN CAMBIOS DE CÓDIGO AQUÍ) =====
   document.addEventListener('DOMContentLoaded', () => {
     const $ = (s) => document.querySelector(s);
     const $$ = (s) => Array.from(document.querySelectorAll(s));
 
     // ====== FORM STATE ======
-    const inputs = { age: $('#age'), education: $('#education'), disability: $('#disability'), monthsExp: $('#monthsExp'), gap: $('#gap'), availability: $('#availability'), digital: $('#digital'), soft: $('#$('#soft'), lang: $('#lang'), transport: $('#transport'), darde: $('#darde'), cv: $('#cv'), interview: $('#interview'), comm: $('#comm'), present: $('#present'), tskill: $('#tskill'), admin: $('#admin'), cover: $('#cover') };
+    const inputs = { age: $('#age'), education: $('#education'), disability: $('#disability'), monthsExp: $('#monthsExp'), gap: $('#gap'), availability: $('#availability'), digital: $('#digital'), soft: $('#soft'), lang: $('#lang'), transport: $('#transport'), darde: $('#darde'), cv: $('#cv'), interview: $('#interview'), comm: $('#comm'), present: $('#present'), tskill: $('#tskill'), admin: $('#admin'), cover: $('#cover') };
     const liveLabels = { age: $('#ageVal'), monthsExp: $('#monthsExpVal'), gap: $('#gapVal'), digital: $('#digitalVal'), soft: $('#softVal'), comm: $('#commVal'), present: $('#presentVal'), tskill: $('#tskillVal'), admin: $('#adminVal') };
 
     const STORAGE_KEY = 'empleabilidad_poc_v02';
-    // Persistimos evidencias de checklist
     const checksState = { digital: { selected: [], notes: '' }, soft: { selected: [], notes: '' }, basics: { selected: [], notes: '' }, comm: { selected: [], notes: '' }, present: { selected: [], notes: '' }, tskill: { selected: [], notes: '' } };
 
-    // Función principal de renderizado y guardado local
-    function render(){
-      const state = stateFromUI(); const {score, band, breakdown} = computeScore(state);
-      const meterBar = document.getElementById('meterBar');
-      const scoreEl = document.getElementById('score');
-      const bandText = document.getElementById('bandText');
-      const labelBand = document.getElementById('labelBand');
-      const breakdownEl = document.getElementById('breakdown');
-      const planEl = document.getElementById('plan');
-
-      if(!scoreEl || !bandText || !labelBand || !meterBar || !breakdownEl || !planEl){ console.error('Faltan elementos del DOM para render'); return; }
-
-      scoreEl.textContent = score.toFixed(0);
-      bandText.textContent = band.label;
-      labelBand.textContent = band.label;
-      labelBand.className = 'pill ' + band.class;
-      meterBar.style.width = score + '%';
-
-      const angle = Math.round((score/100) * 360) + 'deg';
-      const scoreBox = document.querySelector('.score');
-      if(scoreBox) scoreBox.style.setProperty('--angle', angle);
-
-      // Desglose de la puntuación
-      breakdownEl.innerHTML = breakdown.map(b => `
-        <div class="item">
-          <div><div>${b.label}</div><small>${b.max >= 0 ? `máx ${b.max}`: ''}</small></div>
-          <div class="badge ${b.value < 0 ? 'bad' : 'ok'}">${b.value}</div>
-        </div>
-      `).join('');
-
-      // Plan de acción
-      planEl.innerHTML = buildPlan(state, score);
-      syncTaskHandlers();
-
-      // Guardado local automático
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({...state, checks: checksState}));
-    }
-
-    // Conectar todos los inputs y selects para que disparen render()
-    Object.entries(inputs).forEach(([k, el]) => {
-      if (el) {
-        el.addEventListener('input', () => { // 'input' para ranges, 'change' para selects/text
-          if (liveLabels[k]) liveLabels[k].textContent = el.value;
-          render();
-        });
-        el.addEventListener('change', render);
-      }
-    });
-
-    // (El resto de funciones, `computeScore`, `buildPlan`, `buildTextReport`, `download`, `summarizeChecks` se mantienen tal cual)
-
-    // ... [Mantener computeScore, buildPlan, stateFromUI, applyState, buildTextReport, download, exportReportTXT, checkDefs, modal setup, openChecklist, closeChecklist, applyChecklist, syncTaskHandlers, selfTests] ...
-    
-    // ====== SCORING (Mantener tal cual) ======
     function computeScore(state){
       const W = { education:20, experience:15, digital:12, soft:12, comm:10, present:8, tskill:8, admin:8, readiness:7, availability:5, language:5, gapPenalty:-4 };
       const education = Number(state.education);
@@ -446,9 +503,7 @@
     function stateFromUI(){ return Object.fromEntries(Object.entries(inputs).map(([k, el]) => [k, el?.value])); }
     function applyState(state){ Object.entries(state).forEach(([k,v])=>{ if(inputs[k]) inputs[k].value = v; }); Object.keys(liveLabels).forEach(k => { if(liveLabels[k]) liveLabels[k].textContent = inputs[k].value; }); render(); }
 
-
     function buildPlan(s, score){
-      // Base de tareas medibles
       const tasks = [];
       const push = (id,t,d,impact,kpi,due,effort='M')=> tasks.push({id,t,d,impact,kpi,due,effort});
       if(Number(s.admin) < 6) push('admin-core','CV + Cl@ve + SEPE/SCE','CV 1 pág; activar Cl@ve; alta/renovación SEPE/SCE.',10,'Admin ≥6/10 y DARDE ok','Día 3','H');
@@ -568,7 +623,6 @@
       }
     }
 
-    // Checklist definition and functions
     const checkDefs = {
       digital:[
         'Accede a su email sin ayuda','Adjunta un archivo al correo correctamente','Crea un documento y comparte con permiso “ver”','Crea una hoja y usa una fórmula básica (SUMA/Promedio)','Descarga y sube un PDF a una carpeta en la nube','Rellena un formulario online sin errores','Solicita o renueva una cita/trámite administrativo online','Usa 2FA o explica qué es y dónde activarlo','Identifica un intento de phishing (y explica por qué)','Resuelve un problema simple sin ayuda (p.ej. recuperar contraseña)'
@@ -589,8 +643,9 @@
         'Encuentra una ruta en Google Maps','Planifica un transbordo y tiempo de llegada','Sabe comprar/recargar un título de transporte','Llega 10 minutos antes en un simulacro'
       ]
     };
+
     const modal = { backdrop: $('#modalBackdrop'), title: $('#modalTitle'), intro: $('#modalIntro'), checks: $('#modalChecks'), notes: $('#modalNotes'), btnClose: $('#modalClose'), btnCancel: $('#modalCancel'), btnApply: $('#modalApply') };
-    let currentChecklist = null; // 'digital' | 'soft' | 'basics' | 'comm' | 'present' | 'tskill'
+    let currentChecklist = null;
     const bodyLock = (lock)=> document.body.style.overflow = lock ? 'hidden' : '';
 
     function openChecklist(kind){
@@ -616,18 +671,59 @@
       checksState[currentChecklist].selected = selectedIdx;
       checksState[currentChecklist].notes = modal.notes.value.trim();
       const value = Math.min(10, Math.max(0, selectedIdx.length));
-      // Las checklist de 10 puntos (digital, soft, comm, present, tskill) mapean a 10/10 ítems.
       if(currentChecklist==='digital'){ inputs.digital.value = String(value); liveLabels.digital.textContent = value; }
       else if(currentChecklist==='soft'){ inputs.soft.value = String(value); liveLabels.soft.textContent = value; }
       else if(currentChecklist==='comm'){ inputs.comm.value = String(value); liveLabels.comm.textContent = value; }
       else if(currentChecklist==='present'){ inputs.present.value = String(value); liveLabels.present.textContent = value; }
       else if(currentChecklist==='tskill'){ inputs.tskill.value = String(value); liveLabels.tskill.textContent = value; }
-      // La checklist de 'basics' (4 ítems) sube el admin hasta 8 puntos (4*2). El límite de la barra es 10.
       else if(currentChecklist==='basics'){ inputs.admin.value = String(Math.min(10, selectedIdx.length*2)); liveLabels.admin.textContent = inputs.admin.value; }
       closeChecklist(); render();
     }
 
-    // Listeners checklist + cerrar
+    Object.entries(inputs).forEach(([k, el]) => {
+      if (el) {
+        el.addEventListener('input', () => { 
+          if (liveLabels[k]) liveLabels[k].textContent = el.value;
+          render();
+        });
+        el.addEventListener('change', render);
+      }
+    });
+
+    function render(){
+      const state = stateFromUI(); const {score, band, breakdown} = computeScore(state);
+      const meterBar = document.getElementById('meterBar');
+      const scoreEl = document.getElementById('score');
+      const bandText = document.getElementById('bandText');
+      const labelBand = document.getElementById('labelBand');
+      const breakdownEl = document.getElementById('breakdown');
+      const planEl = document.getElementById('plan');
+
+      if(!scoreEl || !bandText || !labelBand || !meterBar || !breakdownEl || !planEl){ console.error('Faltan elementos del DOM para render'); return; }
+
+      scoreEl.textContent = score.toFixed(0);
+      bandText.textContent = band.label;
+      labelBand.textContent = band.label;
+      labelBand.className = 'pill ' + band.class;
+      meterBar.style.width = score + '%';
+
+      const angle = Math.round((score/100) * 360) + 'deg';
+      const scoreBox = document.querySelector('.score');
+      if(scoreBox) scoreBox.style.setProperty('--angle', angle);
+
+      breakdownEl.innerHTML = breakdown.map(b => `
+        <div class="item">
+          <div><div>${b.label}</div><small>${b.max >= 0 ? `máx ${b.max}`: ''}</small></div>
+          <div class="badge ${b.value < 0 ? 'bad' : 'ok'}">${b.value}</div>
+        </div>
+      `).join('');
+
+      planEl.innerHTML = buildPlan(state, score);
+      syncTaskHandlers();
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({...state, checks: checksState}));
+    }
+
     $('#btnChecklistDigital').addEventListener('click', ()=> openChecklist('digital'));
     $('#btnChecklistSoft').addEventListener('click', ()=> openChecklist('soft'));
     $('#btnChecklistBasics').addEventListener('click', ()=> openChecklist('basics'));
@@ -640,8 +736,6 @@
     document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeChecklist(); });
     modal.backdrop.addEventListener('click', (e)=>{ if(e.target === modal.backdrop) closeChecklist(); });
 
-
-    // ====== EXPORT/RESET/SAVE/REPORT (FUNCIONAN AHORA) ======
     document.getElementById('btnExport').addEventListener('click', ()=>{
       const dataToExport = { ...stateFromUI(), checks: checksState };
       const blob = new Blob([JSON.stringify(dataToExport, null, 2)], {type:'application/json'});
@@ -660,7 +754,6 @@
     });
     document.getElementById('btnReportTxt').addEventListener('click', exportReportTXT);
 
-    // Sincroniza handlers de tareas (para marcar como hecho)
     function syncTaskHandlers(){
       const container = document.getElementById('plan'); if(!container) return;
       container.querySelectorAll('.task-card .task-done').forEach(chk=>{
@@ -675,29 +768,23 @@
       });
     }
 
-    // ====== INIT (hash > LS > default) (Maneja la carga inicial de datos) ======
     const fromHash = (hash)=>{ try{ if(hash.startsWith('#s=')) return JSON.parse(decodeURIComponent(escape(atob(hash.slice(3))))); } catch{} return null; };
     const saved = localStorage.getItem(STORAGE_KEY); const shared = fromHash(location.hash);
     if(shared){ applyState(shared); if(shared.checks){ Object.assign(checksState, shared.checks); } }
     else if(saved){ const obj = JSON.parse(saved); applyState(obj); if(obj.checks){ Object.assign(checksState, obj.checks); } }
-    else { render(); } // Render inicial si no hay datos guardados
+    else { render(); }
 
-    // ====== SELF TESTS ======
     (function selfTests(){
       const tests = []; const assert=(name,cond)=>tests.push({name,ok:!!cond});
       assert('Checklist Digital existe', !!document.getElementById('btnChecklistDigital'));
       assert('Checklist Basics existe', !!document.getElementById('btnChecklistBasics'));
-      // Emular 2 checks de basics → admin=4 (ajustado de 6 a 4 para 2 ítems)
-      checksState.basics.selected = [0,1]; inputs.admin.value = '4'; liveLabels.admin.textContent = '4'; render(); // Renderiza para tomar el valor
+      checksState.basics.selected = [0,1]; inputs.admin.value = '4'; liveLabels.admin.textContent = '4'; render();
       assert('Admin 0–10', Number(inputs.admin.value)>=0 && Number(inputs.admin.value)<=10);
       const s = computeScore(stateFromUI()); assert('Score 0–100', s.score >=0 && s.score <=100);
       const report = buildTextReport(); assert('Informe TXT no vacío', (report||'').length > 200);
       const firstTask = document.querySelector('.task-card'); assert('Hay tareas en el plan', !!firstTask);
       const failed = tests.filter(t=>!t.ok); if(failed.length){ console.warn('PRUEBAS FALLIDAS:', failed); } else { console.log('PRUEBAS OK:', tests); }
     })();
-
-    // Helpers en consola
-    window.computeScore = computeScore; window.buildPlan = buildPlan; window.stateFromUI = stateFromUI;
   });
   </script>
 </body>
