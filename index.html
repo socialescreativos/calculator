@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculadora de Empleabilidad · PoC</title>
+  <style>
+    :root {
+      --bg: #0b0d10;
+      --card: #151922;
+      --muted: #a8b3cf;
+      --text: #e7ecf7;
+      --brand: #7aa2ff;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --border: #2a3040;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+    html,body{height:100%}
+    body { margin:0; background: radial-gradient(1200px 800px at 80% -10%, #1b2231 0%, var(--bg) 60%); color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans"; line-height:1.35 }
+    .container { max-width: 1100px; margin: 32px auto; padding: 0 16px; }
+    header { display:flex; gap:16px; align-items:center; justify-content:space-between; margin-bottom:18px; }
+    h1 {font-size: clamp(22px, 2.6vw, 32px); margin:0; letter-spacing: .3px}
+    .subtitle{color:var(--muted); font-size:14px}
+    .row {display:grid; grid-template-columns: 1.2fr .8fr; gap:18px}
+    @media (max-width: 900px){ .row{grid-template-columns: 1fr} }
+    .card {background: linear-gradient(180deg, rgba(255,255,255,.02), transparent 60%) , var(--card); border:1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow)}
+    .card > .card-header {display:flex; align-items:center; justify-content:space-between; padding:16px 18px; border-bottom:1px solid var(--border)}
+    .card > .card-body {padding:18px}
+    .pill {display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid var(--border); border-radius: 999px; background:#121621}
+    .controls {display:flex; gap:8px; flex-wrap:wrap}
+    button, .btn { appearance: none; border:1px solid var(--border); background:#0f1420; color:var(--text); padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:600; transition:.2s transform, .2s background; }
+    button:hover {background:#121a2a}
+    button:active {transform: translateY(1px)}
+    fieldset {border:1px solid var(--border); border-radius:14px; padding:14px; margin:0 0 14px 0}
+    legend {padding:0 8px; color:var(--muted); font-size:12px; letter-spacing:.6px}
+    .grid-2 {display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:12px}
+    .grid-3 {display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:12px}
+    @media (max-width: 700px){ .grid-2,.grid-3{grid-template-columns:1fr} }
+    label {display:block; font-size:13px; color:#cdd6ea; margin-bottom:6px}
+    input[type="range"]{width:100%}
+    input, select, textarea {width:100%; box-sizing:border-box; background:#0c111b; color:var(--text); border:1px solid var(--border); border-radius:10px; padding:10px}
+    textarea{min-height:80px; resize:vertical}
+    .hint{color:var(--muted); font-size:12px}
+    .score-wrap {display:grid; gap:14px}
+    .score { background: conic-gradient(var(--ok) var(--angle,0deg), #233144 0deg); border-radius: 20px; padding:16px; position:relative; overflow:hidden }
+    .score-inner {background: var(--card); border:1px dashed var(--border); border-radius: 14px; padding:14px; text-align:center}
+    .score h2 {margin:0; font-size:22px}
+    .big {font-size:46px; font-weight:800; letter-spacing:.5px}
+    .meter {height:10px; background:#1b2434; border-radius:999px; overflow:hidden; border:1px solid var(--border)}
+    .meter > div {height:100%; width:0%; background: linear-gradient(90deg, var(--bad), var(--warn), var(--ok)); transition: width .4s ease}
+    .bad {color:var(--bad)} .warn{color:var(--warn)} .ok{color:var(--ok)}
+    .list {display:grid; gap:10px}
+    .list .item {display:flex; justify-content:space-between; gap:10px; border:1px solid var(--border); border-radius:12px; padding:10px 12px; background:#0f1522}
+    .item small {color:var(--muted)}
+    .badge {font-weight:700}
+    details {border:1px solid var(--border); border-radius:12px; padding:10px 12px; background:#0f1420}
+    details[open] {background:#10182a}
+    .footer {margin-top:8px; display:flex; gap:8px; flex-wrap:wrap}
+    .sr-only{position:absolute; left:-9999px}
+    .notice{padding:10px 12px; border:1px dashed var(--border); border-radius:12px; background:#0f1420; color:var(--muted); font-size:12px}
+
+    /* Modal */
+    .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:1000; padding:16px; overflow:auto }
+    .modal{ width:min(720px, 96%); background:var(--card); border:1px solid var(--border); border-radius:18px; box-shadow:var(--shadow); max-height:90vh; display:flex; flex-direction:column }
+    .modal .head{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--border) }
+    .modal .body{ padding:14px 16px; overflow:auto; flex:1 }
+    .modal .foot{ display:flex; gap:8px; justify-content:flex-end; padding:14px 16px; border-top:1px solid var(--border) }
+    .checkgrid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px }
+    @media (max-width:700px){ .checkgrid{ grid-template-columns: 1fr } }
+    .checkitem{ display:flex; align-items:flex-start; gap:8px; padding:10px; border:1px solid var(--border); border-radius:12px; background:#0f1420 }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Calculadora de Empleabilidad <span class="subtitle">· PoC ligera (HTML/CSS/JS)</span></h1>
+        <div class="subtitle">Itera lógica y UX · luego conectaremos con Google Sheets</div>
+      </div>
+      <div class="controls">
+        <button id="btnReset" title="Borrar datos">Reiniciar</button>
+        <button id="btnSave" title="Guardar localmente">Guardar</button>
+        <button id="btnLoad" title="Cargar guardado">Cargar</button>
+        <button id="btnExport" title="Exportar JSON">Exportar</button>
+        <label class="btn" for="fileImport" title="Importar JSON">Importar<input id="fileImport" type="file" accept="application/json" class="sr-only"></label>
+      </div>
+    </header>
+
+    <div class="row">
+      <!-- LEFT: FORM -->
+      <section class="card" aria-labelledby="formTitle">
+        <div class="card-header"><strong id="formTitle">Perfil de la persona</strong><span class="pill">v0.2 · PoC</span></div>
+        <div class="card-body">
+
+          <fieldset>
+            <legend>Datos básicos</legend>
+            <div class="grid-3">
+              <div>
+                <label for="age">Edad: <span id="ageVal">30</span> años</label>
+                <input id="age" type="range" min="16" max="65" step="1" value="30" />
+                <div class="hint">El mercado favorece 25–44, pero no penalizamos por penalizar.</div>
+              </div>
+              <div>
+                <label for="education">Nivel educativo</label>
+                <select id="education">
+                  <option value="0">Sin titulación</option>
+                  <option value="8">ESO</option>
+                  <option value="10">Curso profesionalizante (no reglado)</option>
+                  <option value="12">Bachillerato</option>
+                  <option value="14">Certificado profesional (oficial)</option>
+                  <option value="16">FP</option>
+                  <option value="20">Universidad</option>
+                  <option value="22">Postgrado</option>
+                </select>
+                <div class="hint">Peso base (máx 22). Incluye certificados y cursos profesionalizantes.</div>
+              </div>
+              <div>
+                <label for="disability">Discapacidad reconocida</label>
+                <select id="disability">
+                  <option value="none">No</option>
+                  <option value="33">≥33% (general)</option>
+                  <option value="65">≥65% (alta)</option>
+                </select>
+                <div class="hint">Afecta barreras pero también activa incentivos.</div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Experiencia y ritmo</legend>
+            <div class="grid-3">
+              <div>
+                <label for="monthsExp">Meses de experiencia: <span id="monthsExpVal">0</span></label>
+                <input id="monthsExp" type="range" min="0" max="240" step="1" value="0" />
+                <div class="hint">Máx 20 puntos a 60+ meses.</div>
+              </div>
+              <div>
+                <label for="gap">Meses de inactividad recientes: <span id="gapVal">0</span></label>
+                <input id="gap" type="range" min="0" max="48" step="1" value="0" />
+                <div class="hint">Penaliza suave a partir de 6 meses.</div>
+              </div>
+              <div>
+                <label for="availability">Disponibilidad</label>
+                <select id="availability">
+                  <option value="full">Jornada completa</option>
+                  <option value="part">Media jornada</option>
+                  <option value="none">Con restricciones</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Competencias</legend>
+            <div class="grid-2">
+              <div>
+                <label for="digital">Competencia digital (0–10): <span id="digitalVal">5</span></label>
+                <div class="controls">
+                  <input id="digital" type="range" min="0" max="10" step="1" value="5" />
+                  <button id="btnChecklistDigital" type="button">Checklist</button>
+                </div>
+                <div class="hint">Correo, Docs, hojas de cálculo, trámites online…</div>
+              </div>
+              <div>
+                <label for="soft">Habilidades blandas (0–10): <span id="softVal">5</span></label>
+                <div class="controls">
+                  <input id="soft" type="range" min="0" max="10" step="1" value="5" />
+                  <button id="btnChecklistSoft" type="button">Checklist</button>
+                </div>
+                <div class="hint">Comunicación, puntualidad, resolución, actitud.</div>
+              </div>
+            </div>
+            <div class="grid-3" style="margin-top:12px">
+              <div>
+                <label for="lang">Idiomas</label>
+                <select id="lang">
+                  <option value="0">Solo castellano</option>
+                  <option value="3">B1</option>
+                  <option value="6">B2</option>
+                  <option value="8">C1+</option>
+                </select>
+              </div>
+              <div>
+                <label for="transport">Movilidad/Transporte</label>
+                <select id="transport">
+                  <option value="good">Buena</option>
+                  <option value="medium">Limitada</option>
+                  <option value="bad">Muy limitada</option>
+                </select>
+              </div>
+              <div>
+                <label for="rural">Entorno</label>
+                <select id="rural">
+                  <option value="urban">Urbano</option>
+                  <option value="rural">Rural</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Documentación y búsqueda</legend>
+            <div class="grid-3">
+              <div>
+                <label for="darde">DARDE</label>
+                <select id="darde">
+                  <option value="ok">Alta y al día</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              <div>
+                <label for="cv">CV actualizado</label>
+                <select id="cv">
+                  <option value="ok">Sí</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              <div>
+                <label for="interview">Preparación entrevista</label>
+                <select id="interview">
+                  <option value="ok">Sí</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+        </div>
+      </section>
+
+      <!-- RIGHT: SCORE + RECOMMENDATIONS -->
+      <aside class="card" aria-labelledby="scoreTitle">
+        <div class="card-header"><strong id="scoreTitle">Resultado y prioridades de acción</strong><span class="pill" id="labelBand">–</span></div>
+        <div class="card-body score-wrap">
+          <div class="score" aria-live="polite">
+            <div class="score-inner">
+              <h2>Puntuación de empleabilidad</h2>
+              <div class="big" id="score">0</div>
+              <div class="meter" aria-hidden="true"><div id="meterBar"></div></div>
+              <div class="subtitle" id="bandText">–</div>
+            </div>
+          </div>
+
+          <div class="list" id="breakdown" aria-live="polite"></div>
+
+          <details>
+            <summary>¿Cómo se calcula?</summary>
+            <p class="hint">Escala 0–100. Suma ponderada de cuatro bloques (Educación, Experiencia, Competencias, Preparación) con ajustes por barreras/activos contextuales (rural/transportes/gap/idiomas/discapacidad). Penalizaciones suaves (no estigmatizantes) y topes por bloque.</p>
+          </details>
+
+          <div class="card" style="border:1px dashed var(--border)">
+            <div class="card-header"><strong>Plan de 2 semanas (propuesta)</strong></div>
+            <div class="card-body" id="plan"></div>
+          </div>
+
+          <div class="card" style="border:1px dashed var(--border)">
+            <div class="card-header"><strong>Guardar en plataforma</strong></div>
+            <div class="card-body">
+              <div class="grid-3" style="margin-bottom:10px">
+                <div>
+                  <label for="alias">Nombre/Alias persona</label>
+                  <input id="alias" placeholder="Ej.: Kevin R." />
+                </div>
+                <div>
+                  <label for="contact">Contacto (opcional)</label>
+                  <input id="contact" placeholder="Tel/Email" />
+                </div>
+                <div>
+                  <label for="tags">Tags (coma)</label>
+                  <input id="tags" placeholder="jóven, discapacidad" />
+                </div>
+              </div>
+              <div class="controls">
+                <button id="btnSaveRemote">Guardar evaluación</button>
+                <button id="btnOpenPeople">Ver personas</button>
+              </div>
+              <small class="hint">Requiere configurar la Web App de Google Apps Script (ver instrucciones más abajo).</small>
+            </div>
+          </div>
+
+          <div class="footer">
+            <button id="btnShare">Copiar estado</button>
+            <small class="hint">Se guarda automáticamente en este navegador.</small>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="notice">DEBUG: Si algo falla, abre la consola (F12). Hay pruebas básicas que validan selectores y funciones.</div>
+  </div>
+
+  <!-- MODAL CHECKLIST -->
+  <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document">
+      <div class="head">
+        <strong id="modalTitle">Checklist</strong>
+        <button id="modalClose">✕</button>
+      </div>
+      <div class="body">
+        <div id="modalIntro" class="hint" style="margin-bottom:8px"></div>
+        <div id="modalChecks" class="checkgrid"></div>
+        <div style="margin-top:10px">
+          <label for="modalNotes">Evidencias / observaciones</label>
+          <textarea id="modalNotes" placeholder="Ej.: Recuperó contraseña en 3 min sin guía."></textarea>
+        </div>
+      </div>
+      <div class="foot">
+        <button id="modalCancel">Cancelar</button>
+        <button id="modalApply">Aplicar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+    // ====== FORM STATE ======
+    const inputs = { age: $('#age'), education: $('#education'), disability: $('#disability'), monthsExp: $('#monthsExp'), gap: $('#gap'), availability: $('#availability'), digital: $('#digital'), soft: $('#soft'), lang: $('#lang'), transport: $('#transport'), rural: $('#rural'), darde: $('#darde'), cv: $('#cv'), interview: $('#interview') };
+    const liveLabels = { age: $('#ageVal'), monthsExp: $('#monthsExpVal'), gap: $('#gapVal'), digital: $('#digitalVal'), soft: $('#softVal') };
+
+    Object.entries(liveLabels).forEach(([k, el]) => { if (inputs[k] && el) { inputs[k].addEventListener('input', () => el.textContent = inputs[k].value); }});
+
+    const STORAGE_KEY = 'empleabilidad_poc_v02';
+
+    // Persistimos también las evidencias de checklist
+    const checksState = { digital: { selected: [], notes: '' }, soft: { selected: [], notes: '' } };
+
+    // ====== SCORING ======
+    function computeScore(state){
+      const W = { education:22, experience:20, digital:15, soft:10, readiness:10, availability:5, language:8, gapPenalty:-6, transportPenalty:-6, ruralPenalty:-3 };
+      const education = Number(state.education);
+      const exp = Math.min(60, Number(state.monthsExp));
+      const experience = Math.round((exp / 60) * W.experience);
+      const digital = Math.round((Number(state.digital) / 10) * W.digital);
+      const soft = Math.round((Number(state.soft) / 10) * W.soft);
+      let ready = 0; ready += state.darde === 'ok' ? 4 : 0; ready += state.cv === 'ok' ? 3 : 0; ready += state.interview === 'ok' ? 3 : 0;
+      const readiness = ready;
+      const availability = state.availability === 'full' ? 5 : state.availability === 'part' ? 3 : 0;
+      const language = Number(state.lang);
+      const gaps = Math.max(0, Number(state.gap) - 6); const maxGap = Math.abs(W.gapPenalty); const gapPenalty = - Math.min(maxGap, Math.round((gaps / 42) * maxGap));
+      let transportPenalty = 0; if(state.transport === 'medium') transportPenalty = -3; if(state.transport === 'bad') transportPenalty = -6;
+      const ruralPenalty = state.rural === 'rural' ? W.ruralPenalty : 0;
+      const age = Number(state.age); let ageAdj = 0; if(age >= 25 && age <= 44) ageAdj = 2; else if(age < 20 || age > 55) ageAdj = -1;
+      let raw = education + experience + digital + soft + readiness + availability + language + gapPenalty + transportPenalty + ruralPenalty + ageAdj;
+      raw = Math.max(0, Math.min(100, raw));
+      const breakdown = [
+        {label:'Formación (incluye certificados/cursos)', value: education, max: W.education},
+        {label:'Experiencia', value: experience, max: W.experience},
+        {label:'Competencia digital', value: digital, max: W.digital},
+        {label:'Soft skills', value: soft, max: W.soft},
+        {label:'Preparación (DARDE/CV/Entrevista)', value: readiness, max: W.readiness},
+        {label:'Disponibilidad', value: availability, max: 5},
+        {label:'Idiomas', value: language, max: W.language},
+        {label:'Ajuste por edad', value: ageAdj, max: 2},
+        {label:'Penalización por inactividad', value: gapPenalty, max: 0},
+        {label:'Penalización transporte', value: transportPenalty, max: 0},
+        {label:'Ajuste entorno rural', value: ruralPenalty, max: 0}
+      ];
+      let band = {label:'Por arrancar', class:'bad'}; if(raw >= 70) band = {label:'Listo/a para mercado', class:'ok'}; else if(raw >= 45) band = {label:'En progreso', class:'warn'};
+      return {score: raw, band, breakdown};
+    }
+
+    // ====== RENDER ======
+    const meterBar = document.getElementById('meterBar');
+    const scoreEl = document.getElementById('score');
+    const bandText = document.getElementById('bandText');
+    const labelBand = document.getElementById('labelBand');
+    const breakdownEl = document.getElementById('breakdown');
+    const planEl = document.getElementById('plan');
+
+    function stateFromUI(){ return Object.fromEntries(Object.entries(inputs).map(([k, el]) => [k, el?.value])); }
+
+    function applyState(state){ Object.entries(state).forEach(([k,v])=>{ if(inputs[k]) inputs[k].value = v }); Object.keys(liveLabels).forEach(k => { if(liveLabels[k]) liveLabels[k].textContent = inputs[k].value; }); render(); }
+
+    function buildPlan(s, score){
+      const tasks = [];
+      if(s.darde !== 'ok') tasks.push({p: 10, t:'Regulariza DARDE', d:'Pide cita online/telefónica y renueva. Sin esto, ofertas públicas fuera.'});
+      if(s.cv !== 'ok') tasks.push({p: 9, t:'CV en 1 página', d:'Formato simple ATS-friendly. Añade logros y palabras clave del sector.'});
+      if(s.interview !== 'ok') tasks.push({p: 8, t:'Simulacro de entrevista', d:'Guion STAR (Situación-Tarea-Acción-Resultado) x3 experiencias.'});
+      if(Number(s.digital) < 6) tasks.push({p: 9, t:'Sube digital a 6/10', d:'Crea Gmail, Drive, Sheets y tramita un certificado habitual online.'});
+      if(Number(s.soft) < 6) tasks.push({p: 7, t:'Soft skills básicas', d:'Puntualidad, comunicación en 3 pasos, feedback y cierre de tareas.'});
+      if(Number(s.monthsExp) < 6) tasks.push({p: 7, t:'Experiencia puente', d:'Micropráctica/voluntariado focalizado 2–4 semanas en entidad del sector.'});
+      const gap = Number(s.gap); if(gap > 6) tasks.push({p: 8, t:'Narrativa de gap', d:'Preparar relato honesto + aprendizaje + cómo vuelves a ritmo.'});
+      if(s.transport !== 'good') tasks.push({p: 6, t:'Plan de movilidad', d:'Rutas en transporte, carnet B si aplica, teletrabajo parcial.'});
+      if(s.rural === 'rural') tasks.push({p: 6, t:'Búsqueda remota', d:'Filtra trabajos híbridos/remotos y activa alertas con radio 50 km.'});
+      if(Number(s.lang) >= 6) tasks.push({p: 4, t:'Apuesta por idioma', d:'Incluye el idioma en el titular y en 2 logros concretos.'});
+      if(s.disability !== 'none') tasks.push({p: 5, t:'Activa incentivos discapacidad', d:'CEN-CENTROS especiales / bonificaciones. Define objetivo de empresa.'});
+      tasks.sort((a,b)=> b.p - a.p); const top = tasks.slice(0,6); const week1 = top.slice(0,3); const week2 = top.slice(3,6);
+      const badge = score >= 70 ? 'ok' : score >= 45 ? 'warn' : 'bad';
+      let html = `<div class="subtitle">Estado actual: <strong class="${badge}">${score.toFixed(0)}/100</strong>. Objetivo: +15 pts en 14 días.</div>`;
+      html += `<div class=\"grid-2\" style=\"margin-top:10px\">`;
+      html += `<div><strong>Semana 1</strong><ol>` + week1.map(t=>`<li><strong>${t.t}:</strong> ${t.d}</li>`).join('') + `</ol></div>`;
+      html += `<div><strong>Semana 2</strong><ol>` + week2.map(t=>`<li><strong>${t.t}:</strong> ${t.d}</li>`).join('') + `</ol></div>`;
+      html += `</div>`; return html;
+    }
+
+    function render(){
+      const state = stateFromUI(); const {score, band, breakdown} = computeScore(state);
+      if(!scoreEl || !bandText || !labelBand || !meterBar || !breakdownEl || !planEl){ console.error('Faltan elementos del DOM para render'); return; }
+      scoreEl.textContent = score.toFixed(0); bandText.textContent = band.label; labelBand.textContent = band.label; labelBand.className = 'pill ' + band.class; meterBar.style.width = score + '%';
+      const angle = Math.round((score/100) * 360) + 'deg'; const scoreBox = document.querySelector('.score'); if(scoreBox) scoreBox.style.setProperty('--angle', angle);
+      breakdownEl.innerHTML = breakdown.map(b => `
+        <div class="item">
+          <div><div>${b.label}</div><small>${b.max >= 0 ? `máx ${b.max}`: ''}</small></div>
+          <div class="badge ${b.value < 0 ? 'bad' : 'ok'}">${b.value}</div>
+        </div>
+      `).join('');
+      planEl.innerHTML = buildPlan(state, score);
+      // Persistir estado + checks
+      const saveObj = {...state, checks: checksState};
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(saveObj));
+    }
+
+    // ====== CHECKLIST MODAL ======
+    const checkDefs = {
+      digital: [
+        'Accede a su email sin ayuda',
+        'Adjunta un archivo al correo correctamente',
+        'Crea un documento y comparte con permiso “ver”',
+        'Crea una hoja y usa una fórmula básica (SUMA/Promedio)',
+        'Descarga y sube un PDF a una carpeta en la nube',
+        'Rellena un formulario online sin errores',
+        'Solicita o renueva una cita/trámite administrativo online',
+        'Usa 2FA o explica qué es y dónde activarlo',
+        'Identifica un intento de phishing (y explica por qué)',
+        'Resuelve un problema simple sin ayuda (p.ej. recuperar contraseña)'
+      ],
+      soft: [
+        'Puntualidad/fiabilidad: llega a la hora y trae lo pedido',
+        'Comunicación clara: explica una tarea en 1–2 min sin perder el hilo',
+        'Escucha activa: parafrasea y verifica comprensión',
+        'Regulación emocional: mantiene tono respetuoso ante un contratiempo',
+        'Iniciativa: propone alternativa sin que se lo pidan',
+        'Resolución de problemas: divide un problema en pasos',
+        'Colaboración: reparte tareas y pide/da ayuda cuando toca',
+        'Feedback: acepta corrección y ajusta',
+        'Organización: prioriza 3 tareas con plazos realistas',
+        'Cierre: completa tarea y reporta resultado sin recordatorio'
+      ]
+    };
+
+    const modal = {
+      backdrop: $('#modalBackdrop'), title: $('#modalTitle'), intro: $('#modalIntro'), checks: $('#modalChecks'), notes: $('#modalNotes'), btnClose: $('#modalClose'), btnCancel: $('#modalCancel'), btnApply: $('#modalApply')
+    };
+    let currentChecklist = null; // 'digital' | 'soft'
+
+    function bodyLock(lock){ document.body.style.overflow = lock ? 'hidden' : ''; }
+
+    function openChecklist(kind){
+      currentChecklist = kind;
+      modal.title.textContent = (kind === 'digital') ? 'Checklist · Competencia digital' : 'Checklist · Habilidades blandas';
+      modal.intro.textContent = 'Marca evidencias observadas (sí=1). La suma fija el 0–10 automáticamente.';
+      // Pintar checks
+      modal.checks.innerHTML = checkDefs[kind].map((txt,idx)=>{
+        const checked = checksState[kind].selected.includes(idx);
+        return `<label class="checkitem"><input type="checkbox" data-idx="${idx}" ${checked?'checked':''}/> <span>${txt}</span></label>`;
+      }).join('');
+      modal.notes.value = checksState[kind].notes || '';
+      modal.backdrop.style.display = 'flex';
+      modal.backdrop.setAttribute('aria-hidden','false');
+      bodyLock(true);
+    }
+    function closeChecklist(){ modal.backdrop.style.display='none'; modal.backdrop.setAttribute('aria-hidden','true'); bodyLock(false); }
+
+    function applyChecklist(){
+      if(!currentChecklist) return;
+      const boxes = Array.from(modal.checks.querySelectorAll('input[type="checkbox"]'));
+      const selectedIdx = boxes.filter(b=>b.checked).map(b=> Number(b.getAttribute('data-idx')));
+      checksState[currentChecklist].selected = selectedIdx;
+      checksState[currentChecklist].notes = modal.notes.value.trim();
+      // Actualizar slider correspondiente a nº aciertos (0–10)
+      const value = Math.min(10, Math.max(0, selectedIdx.length));
+      if(currentChecklist==='digital'){ inputs.digital.value = String(value); liveLabels.digital.textContent = value; }
+      else { inputs.soft.value = String(value); liveLabels.soft.textContent = value; }
+      closeChecklist();
+      render();
+    }
+
+    $('#btnChecklistDigital').addEventListener('click', ()=> openChecklist('digital'));
+    $('#btnChecklistSoft').addEventListener('click', ()=> openChecklist('soft'));
+    modal.btnClose.addEventListener('click', closeChecklist);
+    modal.btnCancel.addEventListener('click', closeChecklist);
+    modal.btnApply.addEventListener('click', applyChecklist);
+    // Cerrar con ESC y clic fuera
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeChecklist(); });
+    modal.backdrop.addEventListener('click', (e)=>{ if(e.target === modal.backdrop) closeChecklist(); });
+
+    // ====== IMPORT/EXPORT/RESET/SHARE ======
+    $('#btnExport').addEventListener('click', ()=>{
+      const blob = new Blob([JSON.stringify({ ...stateFromUI(), checks: checksState }, null, 2)], {type:'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'empleabilidad_state.json'; a.click(); URL.revokeObjectURL(a.href);
+    });
+    $('#fileImport').addEventListener('change', (e)=>{
+      const file = e.target.files?.[0]; if(!file) return; const reader = new FileReader();
+      reader.onload = () => { try { const obj = JSON.parse(reader.result); applyState(obj); if(obj.checks){ if(obj.checks.digital) checksState.digital = obj.checks.digital; if(obj.checks.soft) checksState.soft = obj.checks.soft; } } catch(err){ alert('Archivo inválido'); } };
+      reader.readAsText(file);
+    });
+    $('#btnReset').addEventListener('click', ()=>{ localStorage.removeItem(STORAGE_KEY); window.location.reload(); });
+    $('#btnSave').addEventListener('click', ()=>{ localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...stateFromUI(), checks: checksState })); alert('Guardado en este navegador.'); });
+    $('#btnLoad').addEventListener('click', ()=>{ const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return alert('No hay guardado.'); const obj = JSON.parse(raw); applyState(obj); if(obj.checks){ if(obj.checks.digital) checksState.digital = obj.checks.digital; if(obj.checks.soft) checksState.soft = obj.checks.soft; } });
+    $('#btnShare').addEventListener('click', ()=>{ const s = btoa(unescape(encodeURIComponent(JSON.stringify({ ...stateFromUI(), checks: checksState })))); const share = location.origin + location.pathname + '#s=' + s; navigator.clipboard.writeText(share).then(()=>{ alert('Enlace copiado. Pegarlo abrirá la calculadora con este estado.'); }); });
+
+    // ====== INIT (hash > LS > default) ======
+    const fromHash = (hash)=>{ try{ if(hash.startsWith('#s=')) return JSON.parse(decodeURIComponent(escape(atob(hash.slice(3))))); } catch{} return null; };
+    const saved = localStorage.getItem(STORAGE_KEY); const shared = fromHash(location.hash);
+    if(shared){ applyState(shared); if(shared.checks){ if(shared.checks.digital) checksState.digital = shared.checks.digital; if(shared.checks.soft) checksState.soft = shared.checks.soft; } }
+    else if(saved){ const obj = JSON.parse(saved); applyState(obj); if(obj.checks){ if(obj.checks.digital) checksState.digital = obj.checks.digital; if(obj.checks.soft) checksState.soft = obj.checks.soft; } }
+    else { render(); }
+
+    // ====== SELF TESTS ======$1})();
+
+    // Exponer helpers al segundo script (guardar remoto)
+    window.computeScore = computeScore;
+    window.buildPlan = buildPlan;
+    window.stateFromUI = stateFromUI;
+  });
+  </script>
+
+  <script>
+  // === CONFIG API (Apps Script Web App) ===
+  document.addEventListener('DOMContentLoaded', () => {
+    window.setApiBase = function(url){ localStorage.setItem('API_BASE', url); alert('API configurada'); };
+    async function api(path, method='GET', data=null){
+      const base = localStorage.getItem('API_BASE') || '';
+      if(!base){ alert('Configura la API: window.setApiBase("https://script.google.com/.../exec")'); throw new Error('API_BASE missing'); }
+      const url = base + (path ? (base.includes('?') ? '&' : '?') + 'path=' + encodeURIComponent(path.replace(/^\//,'')) : '');
+      const opts = { method, headers: { 'Content-Type': 'application/json' }, credentials: 'include' };
+      if(data) opts.body = JSON.stringify(data);
+      const res = await fetch(url, opts);
+      if(!res.ok){ const t = await res.text(); throw new Error('API error ' + res.status + ': ' + t); }
+      return res.json();
+    }
+    async function saveRemote(){ const alias = document.getElementById('alias')?.value.trim(); if(!alias){ alert('Pon al menos un nombre/alias.'); return; } const contact = document.getElementById('contact')?.value.trim() || ''; const tags = document.getElementById('tags')?.value.trim() || ''; const state = (function(){ const o = {}; document.querySelectorAll('select,input[type="range"]').forEach(el=> o[el.id]=el.value); return o; })(); const computeScore = window.computeScore || (()=>({score:0, breakdown:[], band:{label:'',class:''}})); const buildPlan = window.buildPlan || (()=>''); const calc = computeScore(state); const checks = (function(){ try{ const raw = localStorage.getItem('empleabilidad_poc_v02'); const obj = raw? JSON.parse(raw): {}; return obj.checks || {}; }catch{ return {}; } })(); const payload = { person: { alias, contact, tags }, assessment: { state, score: calc.score, breakdown: calc.breakdown, band: calc.band, plan_html: buildPlan(state, calc.score), checks } }; try{ const out = await api('/assessments', 'POST', payload); alert('Guardado: ' + out.message); } catch(err){ alert(err.message); } }
+    const btnSaveRemote = document.getElementById('btnSaveRemote'); const btnOpenPeople = document.getElementById('btnOpenPeople'); if(btnSaveRemote) btnSaveRemote.addEventListener('click', saveRemote); if(btnOpenPeople) btnOpenPeople.addEventListener('click', ()=>{ const base = localStorage.getItem('API_BASE') || ''; if(!base) { alert('Configura la API primero con window.setApiBase(...)'); return; } const url = base + (base.includes('?') ? '&' : '?') + 'path=persons'; window.open(url, '_blank'); });
+  });
+  </script>
+
+  <!-- ===== Instrucciones de despliegue (Apps Script + Sheets) ===== -->
+  <!--
+  1) Crea un Google Sheet con pestañas: persons, assessments, actions, users.
+     - persons: id, alias, contacto, tags, created_at
+     - assessments: id, person_id, fecha, score, band, breakdown_json, state_json, plan_html, autor, checks_json
+     - actions: id, person_id, assessment_id, tarea, estado, deadline, responsable, evidencia_url
+     - users: email, rol, activo
+
+  2) Apps Script (Extensiones > Apps Script). Usa el Code.gs del bloque anterior y añade el campo checks_json al appendRow de assessments si quieres almacenar las evidencias.
+
+  3) Publica como Web App y configura la URL en esta app con: window.setApiBase('https://script.google.com/.../exec')
+  -->
+</body>
+</html>
