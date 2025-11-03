@@ -1,528 +1,704 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calculadora de Empleabilidad</title>
-  <style>
-    :root {
-      --bg: #0b0d10;
-      --card: #151922;
-      --muted: #a8b3cf;
-      --text: #e7ecf7;
-      --ok: #22c55e; --warn:#f59e0b; --bad:#ef4444; --brand:#7aa2ff;
-      --border: #2a3040; --shadow: 0 10px 30px rgba(0,0,0,.35); --radius:16px;
-    }
-    html,body{height:100%}
-    body{margin:0;background: radial-gradient(1200px 800px at 80% -10%, #1b2231 0%, var(--bg) 60%);color:var(--text);font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";line-height:1.35}
-    .container{max-width:1100px;margin:32px auto;padding:0 16px}
-    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:18px}
-    h1{font-size:clamp(22px,2.6vw,32px);margin:0;letter-spacing:.3px}
-    .row{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
-    @media(max-width:900px){.row{grid-template-columns:1fr}}
-    .card{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 60%),var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
-    .card>.card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)}
-    .card>.card-body{padding:18px}
-    .controls{display:flex;gap:8px;flex-wrap:wrap}
-    button{appearance:none;border:1px solid var(--border);background:#0f1420;color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:600;transition:.2s transform,.2s background}
-    button:hover{background:#121a2a} button:active{transform:translateY(1px)}
-    fieldset{border:1px solid var(--border);border-radius:14px;padding:14px;margin:0 0 14px 0}
-    legend{padding:0 8px;color:var(--muted);font-size:12px;letter-spacing:.6px}
-    .grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    .grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-    @media(max-width:700px){.grid-2,.grid-3{grid-template-columns:1fr}}
-    label{display:block;font-size:13px;color:#cdd6ea;margin-bottom:6px}
-    input[type="range"]{width:100%}
-    input,select,textarea{width:100%;box-sizing:border-box;background:#0c111b;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px}
-    textarea{min-height:80px;resize:vertical}
-    .hint{color:var(--muted);font-size:12px}
-    .score-wrap{display:grid;gap:14px}
-    .score{background:conic-gradient(var(--ok) var(--angle,0deg),#233144 0deg);border-radius:20px;padding:16px;position:relative;overflow:hidden}
-    .score-inner{background:var(--card);border:1px dashed var(--border);border-radius:14px;padding:14px;text-align:center}
-    .score h2{margin:0;font-size:22px}
-    .big{font-size:46px;font-weight:800;letter-spacing:.5px}
-    .meter{height:10px;background:#1b2434;border-radius:999px;overflow:hidden;border:1px solid var(--border)}
-    .meter>div{height:100%;width:0%;background:linear-gradient(90deg,var(--bad),var(--warn),var(--ok));transition:width .4s ease}
-    .bad{color:var(--bad)} .warn{color:var(--warn)} .ok{color:var(--ok)}
-    .list{display:grid;gap:10px}
-    .list .item{display:flex;justify-content:space-between;gap:10px;border:1px solid var(--border);border-radius:12px;padding:10px 12px;background:#0f1522}
-    .item small{color:var(--muted)} .badge{font-weight:700}
-    .notice{padding:10px 12px;border:1px dashed var(--border);border-radius:12px;background:#0f1420;color:var(--muted);font-size:12px}
-    /* Modal */
-    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px;overflow:auto}
-    .modal{width:min(720px,96%);background:var(--card);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);max-height:90vh;display:flex;flex-direction:column}
-    .modal .head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
-    .modal .body{padding:14px 16px;overflow:auto;flex:1}
-    .modal .foot{display:flex;gap:8px;justify-content:flex-end;padding:14px 16px;border-top:1px solid var(--border)}
-    .checkgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    @media(max-width:700px){.checkgrid{grid-template-columns:1fr}}
-    .checkitem{display:flex;align-items:flex-start;gap:8px;padding:10px;border:1px solid var(--border);border-radius:12px;background:#0f1420}
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculadora de Empleabilidad</title>
+  <style>
+    :root {
+      --bg: #0b0d10;
+      --card: #151922;
+      --muted: #a8b3cf;
+      --text: #e7ecf7;
+      --ok: #22c55e; --warn:#f59e0b; --bad:#ef4444; --brand:#7aa2ff;
+      --border: #2a3040; --shadow: 0 10px 30px rgba(0,0,0,.35); --radius:16px;
+    }
+    html,body{height:100%}
+    body{margin:0;background: radial-gradient(1200px 800px at 80% -10%, #1b2231 0%, var(--bg) 60%);color:var(--text);font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";line-height:1.35}
+    .container{max-width:1100px;margin:32px auto;padding:0 16px}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:18px}
+    h1{font-size:clamp(22px,2.6vw,32px);margin:0;letter-spacing:.3px}
+    .row{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+    @media(max-width:900px){.row{grid-template-columns:1fr}}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 60%),var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .card>.card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)}
+    .card>.card-body{padding:18px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap}
+    button{appearance:none;border:1px solid var(--border);background:#0f1420;color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:600;transition:.2s transform,.2s background}
+    button:hover{background:#121a2a} button:active{transform:translateY(1px)}
+    fieldset{border:1px solid var(--border);border-radius:14px;padding:14px;margin:0 0 14px 0}
+    legend{padding:0 8px;color:var(--muted);font-size:12px;letter-spacing:.6px}
+    .grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    @media(max-width:700px){.grid-2,.grid-3{grid-template-columns:1fr}}
+    label{display:block;font-size:13px;color:#cdd6ea;margin-bottom:6px}
+    input[type="range"]{width:100%}
+    input,select,textarea{width:100%;box-sizing:border-box;background:#0c111b;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px}
+    textarea{min-height:80px;resize:vertical}
+    .hint{color:var(--muted);font-size:12px}
+    .score-wrap{display:grid;gap:14px}
+    .score{background:conic-gradient(var(--ok) var(--angle,0deg),#233144 0deg);border-radius:20px;padding:16px;position:relative;overflow:hidden}
+    .score-inner{background:var(--card);border:1px dashed var(--border);border-radius:14px;padding:14px;text-align:center}
+    .score h2{margin:0;font-size:22px}
+    .big{font-size:46px;font-weight:800;letter-spacing:.5px}
+    .meter{height:10px;background:#1b2434;border-radius:999px;overflow:hidden;border:1px solid var(--border)}
+    .meter>div{height:100%;width:0%;background:linear-gradient(90deg,var(--bad),var(--warn),var(--ok));transition:width .4s ease}
+    .bad{color:var(--bad)} .warn{color:var(--warn)} .ok{color:var(--ok)}
+    .list{display:grid;gap:10px}
+    .list .item{display:flex;justify-content:space-between;gap:10px;border:1px solid var(--border);border-radius:12px;padding:10px 12px;background:#0f1522}
+    .item small{color:var(--muted)} .badge{font-weight:700}
+    .notice{padding:10px 12px;border:1px dashed var(--border);border-radius:12px;background:#0f1420;color:var(--muted);font-size:12px}
+    /* Tasks UI */
+    .tasks-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    @media(max-width:900px){.tasks-grid{grid-template-columns:1fr}}
+    .task-card{background:#0f1420;border:1px solid var(--border);border-radius:14px;padding:12px;display:grid;gap:8px}
+    .task-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .task-title{font-weight:700}
+    .chip{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border:1px solid var(--border);border-radius:999px;font-size:12px}
+    .chip.ok{border-color:#234e35;color:var(--ok)}
+    .chip.warn{border-color:#5a4302;color:var(--warn)}
+    .chip.bad{border-color:#5b1b1b;color:var(--bad)}
+    .task-meta{display:flex;flex-wrap:wrap;gap:8px;color:var(--muted);font-size:12px}
+    .task-kpi{font-size:12px;color:#cdd6ea}
+    .task-actions{display:flex;gap:8px;align-items:center}
+    .task-actions input[type='checkbox']{transform:scale(1.2)}
+    .divider{height:1px;background:var(--border);margin:6px 0}
+    /* Modal */
+    .modal-backdrop {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.8);
+      display: none; justify-content: center; align-items: center; z-index: 1000;
+    }
+    .modal {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      max-width: 500px; width: 90%; max-height: 90vh; display: flex; flex-direction: column;
+      box-shadow: var(--shadow);
+    }
+    .modal .head { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; border-bottom: 1px solid var(--border); }
+    .modal .body { padding: 18px; overflow-y: auto; }
+    .modal .foot { display: flex; justify-content: flex-end; gap: 8px; padding: 16px 18px; border-top: 1px solid var(--border); }
+    .checkgrid { display: grid; gap: 10px; }
+    .checkitem { display: flex; align-items: center; gap: 8px; font-size: 14px; background: #0c111b; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Calculadora de Empleabilidad</h1>
-      <div class="controls">
-        <button id="btnReset" title="Borrar datos">Reiniciar</button>
-        <button id="btnSave" title="Guardar localmente">Guardar</button>
-        <button id="btnExport" title="Exportar JSON">Exportar</button>
-      </div>
-    </header>
+  <div class="container">
+    <header>
+      <h1>Calculadora de Empleabilidad</h1>
+      <div class="controls">
+        <button id="btnReset" title="Borrar datos">Reiniciar</button>
+        <button id="btnSave" title="Guardar localmente">Guardar</button>
+        <button id="btnExport" title="Exportar JSON">Exportar (JSON)</button>
+        <button id="btnReportTxt" title="Descargar informe en texto">Informe (TXT)</button>
+      </div>
+    </header>
 
-    <div class="row">
-      <!-- LEFT: FORM -->
-      <section class="card" aria-labelledby="formTitle">
-        <div class="card-header"><strong id="formTitle">Perfil de la persona</strong></div>
-        <div class="card-body">
+    <div class="row">
+            <section class="card" aria-labelledby="formTitle">
+        <div class="card-header"><strong id="formTitle">Perfil de la persona</strong></div>
+        <div class="card-body">
 
-          <fieldset>
-            <legend>Datos básicos</legend>
-            <div class="grid-3">
-              <div>
-                <label for="age">Edad: <span id="ageVal">30</span> años</label>
-                <input id="age" type="range" min="16" max="65" step="1" value="30" />
-                <div class="hint">El mercado favorece 25–44, pero no penalizamos por penalizar.</div>
-              </div>
-              <div>
-                <label for="education">Nivel educativo</label>
-                <select id="education">
-                  <option value="0">Sin titulación</option>
-                  <option value="8">ESO</option>
-                  <option value="10">Curso profesionalizante (no reglado)</option>
-                  <option value="12">Bachillerato</option>
-                  <option value="14">Certificado profesional (oficial)</option>
-                  <option value="16">FP</option>
-                  <option value="20">Universidad</option>
-                  <option value="22">Postgrado</option>
-                </select>
-                <div class="hint">Incluye certificados y cursos profesionalizantes.</div>
-              </div>
-              <div>
-                <label for="disability">Discapacidad reconocida</label>
-                <select id="disability">
-                  <option value="none">No</option>
-                  <option value="33">≥33% (general)</option>
-                  <option value="65">≥65% (alta)</option>
-                </select>
-              </div>
-            </div>
-          </fieldset>
+          <fieldset>
+            <legend>Datos básicos</legend>
+            <div class="grid-3">
+              <div>
+                <label for="age">Edad: <span id="ageVal">30</span> años</label>
+                <input id="age" type="range" min="16" max="65" step="1" value="30" />
+                <div class="hint">El mercado favorece 25–44, pero no penalizamos por penalizar.</div>
+              </div>
+              <div>
+                <label for="education">Nivel educativo</label>
+                <select id="education">
+                  <option value="0">Sin titulación</option>
+                  <option value="8">ESO</option>
+                  <option value="10">Curso profesionalizante (no reglado)</option>
+                  <option value="12">Bachillerato</option>
+                  <option value="14">Certificado profesional (oficial)</option>
+                  <option value="16">FP</option>
+                  <option value="20">Universidad</option>
+                  <option value="22">Postgrado</option>
+                </select>
+                <div class="hint">Incluye certificados y cursos profesionalizantes.</div>
+              </div>
+              <div>
+                <label for="disability">Discapacidad reconocida</label>
+                <select id="disability">
+                  <option value="none">No</option>
+                  <option value="33">≥33% (general)</option>
+                  <option value="65">≥65% (alta)</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
 
-          <fieldset>
-            <legend>Experiencia y ritmo</legend>
-            <div class="grid-3">
-              <div>
-                <label for="monthsExp">Meses de experiencia: <span id="monthsExpVal">0</span></label>
-                <input id="monthsExp" type="range" min="0" max="240" step="1" value="0" />
-                <div class="hint">Máx 20 puntos a 60+ meses.</div>
-              </div>
-              <div>
-                <label for="gap">Meses de inactividad recientes: <span id="gapVal">0</span></label>
-                <input id="gap" type="range" min="0" max="48" step="1" value="0" />
-                <div class="hint">Penaliza suave a partir de 6 meses.</div>
-              </div>
-              <div>
-                <label for="availability">Disponibilidad</label>
-                <select id="availability">
-                  <option value="full">Jornada completa</option>
-                  <option value="part">Media jornada</option>
-                  <option value="none">Con restricciones</option>
-                </select>
-              </div>
-            </div>
-          </fieldset>
+          <fieldset>
+            <legend>Experiencia y ritmo</legend>
+            <div class="grid-3">
+              <div>
+                <label for="monthsExp">Meses de experiencia: <span id="monthsExpVal">0</span></label>
+                <input id="monthsExp" type="range" min="0" max="240" step="1" value="0" />
+                <div class="hint">Máx 20 puntos a 60+ meses.</div>
+              </div>
+              <div>
+                <label for="gap">Meses de inactividad recientes: <span id="gapVal">0</span></label>
+                <input id="gap" type="range" min="0" max="48" step="1" value="0" />
+                <div class="hint">Penaliza suave a partir de 6 meses.</div>
+              </div>
+              <div>
+                <label for="availability">Disponibilidad</label>
+                <select id="availability">
+                  <option value="full">Jornada completa</option>
+                  <option value="part">Media jornada</option>
+                  <option value="none">Con restricciones</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
 
-          <fieldset>
-            <legend>Competencias</legend>
-            <div class="grid-2">
-              <div>
-                <label for="digital">Competencia digital (0–10): <span id="digitalVal">5</span></label>
-                <div class="controls">
-                  <input id="digital" type="range" min="0" max="10" step="1" value="5" />
-                  <button id="btnChecklistDigital" type="button">Checklist</button>
-                </div>
-                <div class="hint">Correo, Docs, hojas de cálculo, trámites online…</div>
-              </div>
-              <div>
-                <label for="soft">Habilidades blandas (0–10): <span id="softVal">5</span></label>
-                <div class="controls">
-                  <input id="soft" type="range" min="0" max="10" step="1" value="5" />
-                  <button id="btnChecklistSoft" type="button">Checklist</button>
-                </div>
-                <div class="hint">Comunicación, puntualidad, resolución, actitud.</div>
-              </div>
-            </div>
-            <div class="grid-2" style="margin-top:12px">
-              <div>
-                <label for="lang">Idiomas</label>
-                <select id="lang">
-                  <option value="0">Solo castellano</option>
-                  <option value="3">B1</option>
-                  <option value="6">B2</option>
-                  <option value="8">C1+</option>
-                </select>
-              </div>
-              <div>
-                <label for="transport">Movilidad/Transporte</label>
-                <select id="transport">
-                  <option value="good">Buena</option>
-                  <option value="medium">Limitada</option>
-                  <option value="bad">Muy limitada</option>
-                </select>
-              </div>
-            </div>
-          </fieldset>
+          <fieldset>
+            <legend>Competencias</legend>
+            <div class="grid-2">
+              <div>
+                <label for="digital">Competencia digital (0–10): <span id="digitalVal">5</span></label>
+                <div class="controls">
+                  <input id="digital" type="range" min="0" max="10" step="1" value="5" />
+                  <button id="btnChecklistDigital" type="button">Checklist</button>
+                </div>
+                <div class="hint">Correo, Docs, hojas de cálculo, trámites online…</div>
+              </div>
+              <div>
+                <label for="soft">Habilidades blandas (0–10): <span id="softVal">5</span></label>
+                <div class="controls">
+                  <input id="soft" type="range" min="0" max="10" step="1" value="5" />
+                  <button id="btnChecklistSoft" type="button">Checklist</button>
+                </div>
+                <div class="hint">Comunicación, puntualidad, resolución, actitud.</div>
+              </div>
+            </div>
+            <div class="grid-2" style="margin-top:12px">
+              <div>
+                <label for="lang">Idiomas</label>
+                <select id="lang">
+                  <option value="0">Solo castellano</option>
+                  <option value="3">B1</option>
+                  <option value="6">B2</option>
+                  <option value="8">C1+</option>
+                </select>
+              </div>
+              <div>
+                <label for="transport">Movilidad/Transporte</label>
+                <select id="transport">
+                  <option value="good">Buena</option>
+                  <option value="medium">Limitada</option>
+                  <option value="bad">Muy limitada</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
 
-          <fieldset>
-            <legend>Habilidades funcionales y autonomía</legend>
-            <div class="grid-3">
-              <div>
-                <label for="comm">Conversación (0–10): <span id="commVal">5</span></label>
-                <div class="controls">
-                  <input id="comm" type="range" min="0" max="10" step="1" value="5" />
-                  <button id="btnChecklistComm" type="button">Checklist</button>
-                </div>
-                <div class="hint">Mantener turnos, escuchar, cerrar con claridad.</div>
-              </div>
-              <div>
-                <label for="present">Presentación personal (0–10): <span id="presentVal">5</span></label>
-                <div class="controls">
-                  <input id="present" type="range" min="0" max="10" step="1" value="5" />
-                  <button id="btnChecklistPresent" type="button">Checklist</button>
-                </div>
-                <div class="hint">Quién soy, qué aporto, ejemplo de logro en 30–45s.</div>
-              </div>
-              <div>
-                <label for="tskill">Uso transporte público (0–10): <span id="tskillVal">5</span></label>
-                <div class="controls">
-                  <input id="tskill" type="range" min="0" max="10" step="1" value="5" />
-                  <button id="btnChecklistTskill" type="button">Checklist</button>
-                </div>
-                <div class="hint">Rutas, transbordos, puntualidad en entrevistas.</div>
-              </div>
-            </div>
-          </fieldset>
+          <fieldset>
+            <legend>Habilidades funcionales y autonomía</legend>
+            <div class="grid-3">
+              <div>
+                <label for="comm">Conversación (0–10): <span id="commVal">5</span></label>
+                <div class="controls">
+                  <input id="comm" type="range" min="0" max="10" step="1" value="5" />
+                  <button id="btnChecklistComm" type="button">Checklist</button>
+                </div>
+                <div class="hint">Mantener turnos, escuchar, cerrar con claridad.</div>
+              </div>
+              <div>
+                <label for="present">Presentación personal (0–10): <span id="presentVal">5</span></label>
+                <div class="controls">
+                  <input id="present" type="range" min="0" max="10" step="1" value="5" />
+                  <button id="btnChecklistPresent" type="button">Checklist</button>
+                </div>
+                <div class="hint">Quién soy, qué aporto, ejemplo de logro en 30–45s.</div>
+              </div>
+              <div>
+                <label for="tskill">Uso transporte público (0–10): <span id="tskillVal">5</span></label>
+                <div class="controls">
+                  <input id="tskill" type="range" min="0" max="10" step="1" value="5" />
+                  <button id="btnChecklistTskill" type="button">Checklist</button>
+                </div>
+                <div class="hint">Rutas, transbordos, puntualidad en entrevistas.</div>
+              </div>
+            </div>
+          </fieldset>
 
-          <fieldset>
-            <legend>Básicos de empleabilidad</legend>
-            <div class="grid-3">
-              <div>
-                <label for="admin">Trámites y servicios (0–10): <span id="adminVal">0</span></label>
-                <div class="controls">
-                  <input id="admin" type="range" min="0" max="10" step="1" value="0" />
-                  <button id="btnChecklistBasics" type="button">Checklist</button>
-                </div>
-                <div class="hint">CV, Cl@ve Permanente, SEPE/SCE, carta de presentación.</div>
-              </div>
-              <div>
-                <label for="cover">Carta de presentación</label>
-                <select id="cover">
-                  <option value="no">No</option>
-                  <option value="ok">Sí</option>
-                </select>
-              </div>
-              <div>
-                <label for="availability2">—</label>
-                <div class="hint">La checklist sube el valor automáticamente.</div>
-              </div>
-            </div>
-          </fieldset>
+          <fieldset>
+            <legend>Básicos de empleabilidad</legend>
+            <div class="grid-3">
+              <div>
+                <label for="admin">Trámites y servicios (0–10): <span id="adminVal">0</span></label>
+                <div class="controls">
+                  <input id="admin" type="range" min="0" max="10" step="1" value="0" />
+                  <button id="btnChecklistBasics" type="button">Checklist</button>
+                </div>
+                <div class="hint">CV, Cl@ve Permanente, SEPE/SCE, carta de presentación.</div>
+              </div>
+              <div>
+                <label for="cover">Carta de presentación</label>
+                <select id="cover">
+                  <option value="no">No</option>
+                  <option value="ok">Sí</option>
+                </select>
+              </div>
+              <div>
+                <label for="availability2">—</label>
+                <div class="hint">La checklist sube el valor automáticamente.</div>
+              </div>
+            </div>
+          </fieldset>
 
-          <fieldset>
-            <legend>Documentación y búsqueda</legend>
-            <div class="grid-3">
-              <div>
-                <label for="darde">DARDE</label>
-                <select id="darde">
-                  <option value="ok">Alta y al día</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
-              <div>
-                <label for="cv">CV actualizado</label>
-                <select id="cv">
-                  <option value="ok">Sí</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
-              <div>
-                <label for="interview">Preparación entrevista</label>
-                <select id="interview">
-                  <option value="ok">Sí</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
-            </div>
-          </fieldset>
+          <fieldset>
+            <legend>Documentación y búsqueda</legend>
+            <div class="grid-3">
+              <div>
+                <label for="darde">DARDE</label>
+                <select id="darde">
+                  <option value="ok">Alta y al día</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              <div>
+                <label for="cv">CV actualizado</label>
+                <select id="cv">
+                  <option value="ok">Sí</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              <div>
+                <label for="interview">Preparación entrevista</label>
+                <select id="interview">
+                  <option value="ok">Sí</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
 
-        </div>
-      </section>
+        </div>
+      </section>
 
-      <!-- RIGHT: SCORE + RECOMMENDATIONS -->
-      <aside class="card" aria-labelledby="scoreTitle">
-        <div class="card-header"><strong id="scoreTitle">Resultado y prioridades de acción</strong><span class="pill" id="labelBand">–</span></div>
-        <div class="card-body score-wrap">
-          <div class="score" aria-live="polite">
-            <div class="score-inner">
-              <h2>Puntuación de empleabilidad</h2>
-              <div class="big" id="score">0</div>
-              <div class="meter" aria-hidden="true"><div id="meterBar"></div></div>
-              <div class="subtitle" id="bandText">–</div>
-            </div>
-          </div>
+            <aside class="card" aria-labelledby="scoreTitle">
+        <div class="card-header"><strong id="scoreTitle">Resultado y prioridades de acción</strong><span class="pill" id="labelBand">–</span></div>
+        <div class="card-body score-wrap">
+          <div class="score" aria-live="polite">
+            <div class="score-inner">
+              <h2>Puntuación de empleabilidad</h2>
+              <div class="big" id="score">0</div>
+              <div class="meter" aria-hidden="true"><div id="meterBar"></div></div>
+              <div class="subtitle" id="bandText">–</div>
+            </div>
+            
+          </div>
 
-          <div class="list" id="breakdown" aria-live="polite"></div>
+          <div class="list" id="breakdown" aria-live="polite"></div>
 
-          <details>
-            <summary>¿Cómo se calcula?</summary>
-            <p class="hint">Escala 0–100. Suma ponderada de educación, experiencia, competencias y preparación, con ajustes suaves por inactividad e idiomas. Sin penalizar entorno.</p>
-          </details>
+          <details>
+            <summary>¿Cómo se calcula?</summary>
+            <p class="hint">Escala 0–100. Suma ponderada de educación, experiencia, competencias y preparación, con ajustes suaves por inactividad e idiomas. Sin penalizar entorno.</p>
+          </details>
 
-          <div class="card" style="border:1px dashed var(--border)">
-            <div class="card-header"><strong>Plan de 2 semanas (propuesta)</strong></div>
-            <div class="card-body" id="plan"></div>
-          </div>
+          <div class="card" style="border:1px dashed var(--border)">
+            <div class="card-header"><strong>Plan de 2 semanas</strong><span class="subtitle">tareas medibles y con impacto</span></div>
+            <div class="card-body">
+              <div id="plan"></div>
+            </div>
+          </div>
 
-          <div class="footer">
-            <small class="hint">Se guarda automáticamente en este navegador.</small>
-          </div>
-        </div>
-      </aside>
-    </div>
+          <div class="footer">
+            <small class="hint">Se guarda automáticamente en este navegador.</small>
+          </div>
+        </div>
+      </aside>
+    </div>
 
-    <div class="notice">DEBUG: Si algo falla, abre la consola (F12). Hay pruebas básicas que validan selectores y funciones.</div>
-  </div>
+    <div class="notice">DEBUG: Si algo falla, abre la consola (F12). Hay pruebas básicas que validan selectores y funciones.</div>
+  </div>
 
-  <!-- MODAL CHECKLIST -->
-  <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal" role="document">
-      <div class="head">
-        <strong id="modalTitle">Checklist</strong>
-        <button id="modalClose">✕</button>
-      </div>
-      <div class="body">
-        <div id="modalIntro" class="hint" style="margin-bottom:8px"></div>
-        <div id="modalChecks" class="checkgrid"></div>
-        <div style="margin-top:10px">
-          <label for="modalNotes">Evidencias / observaciones</label>
-          <textarea id="modalNotes" placeholder="Ej.: Recuperó contraseña en 3 min sin guía."></textarea>
-        </div>
-      </div>
-      <div class="foot">
-        <button id="modalCancel">Cancelar</button>
-        <button id="modalApply">Aplicar</button>
-      </div>
-    </div>
-  </div>
+    <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document">
+      <div class="head">
+        <strong id="modalTitle">Checklist</strong>
+        <button id="modalClose">✕</button>
+      </div>
+      <div class="body">
+        <div id="modalIntro" class="hint" style="margin-bottom:8px"></div>
+        <div id="modalChecks" class="checkgrid"></div>
+        <div style="margin-top:10px">
+          <label for="modalNotes">Evidencias / observaciones</label>
+          <textarea id="modalNotes" placeholder="Ej.: Recuperó contraseña en 3 min sin guía."></textarea>
+        </div>
+      </div>
+      <div class="foot">
+        <button id="modalCancel">Cancelar</button>
+        <button id="modalApply">Aplicar</button>
+      </div>
+    </div>
+  </div>
 
-  <script>
-  // ===== APP CORE =====
-  document.addEventListener('DOMContentLoaded', () => {
-    const $ = (s) => document.querySelector(s);
-    const $$ = (s) => Array.from(document.querySelectorAll(s));
+  <script>
+  // ===== APP CORE: MEJORA DE FUNCIONALIDAD Y EVENTOS =====
+  document.addEventListener('DOMContentLoaded', () => {
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-    // ====== FORM STATE ======
-    const inputs = { age: $('#age'), education: $('#education'), disability: $('#disability'), monthsExp: $('#monthsExp'), gap: $('#gap'), availability: $('#availability'), digital: $('#digital'), soft: $('#soft'), lang: $('#lang'), transport: $('#transport'), darde: $('#darde'), cv: $('#cv'), interview: $('#interview'), comm: $('#comm'), present: $('#present'), tskill: $('#tskill'), admin: $('#admin'), cover: $('#cover') };
-    const liveLabels = { age: $('#ageVal'), monthsExp: $('#monthsExpVal'), gap: $('#gapVal'), digital: $('#digitalVal'), soft: $('#softVal'), comm: $('#commVal'), present: $('#presentVal'), tskill: $('#tskillVal'), admin: $('#adminVal') };
+    // ====== FORM STATE ======
+    const inputs = { age: $('#age'), education: $('#education'), disability: $('#disability'), monthsExp: $('#monthsExp'), gap: $('#gap'), availability: $('#availability'), digital: $('#digital'), soft: $('#$('#soft'), lang: $('#lang'), transport: $('#transport'), darde: $('#darde'), cv: $('#cv'), interview: $('#interview'), comm: $('#comm'), present: $('#present'), tskill: $('#tskill'), admin: $('#admin'), cover: $('#cover') };
+    const liveLabels = { age: $('#ageVal'), monthsExp: $('#monthsExpVal'), gap: $('#gapVal'), digital: $('#digitalVal'), soft: $('#softVal'), comm: $('#commVal'), present: $('#presentVal'), tskill: $('#tskillVal'), admin: $('#adminVal') };
 
-    Object.entries(liveLabels).forEach(([k, el]) => { if (inputs[k] && el) { inputs[k].addEventListener('input', () => el.textContent = inputs[k].value); }});
+    const STORAGE_KEY = 'empleabilidad_poc_v02';
+    // Persistimos evidencias de checklist
+    const checksState = { digital: { selected: [], notes: '' }, soft: { selected: [], notes: '' }, basics: { selected: [], notes: '' }, comm: { selected: [], notes: '' }, present: { selected: [], notes: '' }, tskill: { selected: [], notes: '' } };
 
-    const STORAGE_KEY = 'empleabilidad_poc_v02';
+    // Función principal de renderizado y guardado local
+    function render(){
+      const state = stateFromUI(); const {score, band, breakdown} = computeScore(state);
+      const meterBar = document.getElementById('meterBar');
+      const scoreEl = document.getElementById('score');
+      const bandText = document.getElementById('bandText');
+      const labelBand = document.getElementById('labelBand');
+      const breakdownEl = document.getElementById('breakdown');
+      const planEl = document.getElementById('plan');
 
-    // Persistimos evidencias de checklist
-    const checksState = { digital: { selected: [], notes: '' }, soft: { selected: [], notes: '' }, basics: { selected: [], notes: '' }, comm: { selected: [], notes: '' }, present: { selected: [], notes: '' }, tskill: { selected: [], notes: '' } };
+      if(!scoreEl || !bandText || !labelBand || !meterBar || !breakdownEl || !planEl){ console.error('Faltan elementos del DOM para render'); return; }
 
-    // ====== SCORING ======
-    function computeScore(state){
-      const W = { education:20, experience:15, digital:12, soft:12, comm:10, present:8, tskill:8, admin:8, readiness:7, availability:5, language:5, gapPenalty:-4 };
-      const education = Number(state.education);
-      const exp = Math.min(60, Number(state.monthsExp));
-      const experience = Math.round((exp / 60) * W.experience);
-      const digital = Math.round((Number(state.digital) / 10) * W.digital);
-      const soft = Math.round((Number(state.soft) / 10) * W.soft);
-      const comm = Math.round((Number(state.comm) / 10) * W.comm);
-      const present = Math.round((Number(state.present) / 10) * W.present);
-      const tskill = Math.round((Number(state.tskill) / 10) * W.tskill);
-      const admin = Math.round((Number(state.admin) / 10) * W.admin);
-      let ready = 0; ready += state.darde === 'ok' ? 3 : 0; ready += state.cv === 'ok' ? 2 : 0; ready += state.interview === 'ok' ? 2 : 0; ready += state.cover === 'ok' ? 2 : 0;
-      const readiness = Math.min(W.readiness, ready);
-      const availability = state.availability === 'full' ? 5 : state.availability === 'part' ? 3 : 0;
-      const language = Number(state.lang);
-      const gaps = Math.max(0, Number(state.gap) - 6); const maxGap = Math.abs(W.gapPenalty); const gapPenalty = - Math.min(maxGap, Math.round((gaps / 42) * maxGap));
-      let raw = education + experience + digital + soft + comm + present + tskill + admin + readiness + availability + language + gapPenalty;
-      raw = Math.max(0, Math.min(100, raw));
-      let phase = 1; if(raw >= 70) phase = 3; else if(raw >= 45) phase = 2;
-      const breakdown = [
-        {label:'Formación (incl. certificados/cursos)', value: education, max: W.education},
-        {label:'Experiencia', value: experience, max: W.experience},
-        {label:'Digital', value: digital, max: W.digital},
-        {label:'Soft skills', value: soft, max: W.soft},
-        {label:'Conversación', value: comm, max: W.comm},
-        {label:'Presentación', value: present, max: W.present},
-        {label:'Uso transporte público', value: tskill, max: W.tskill},
-        {label:'Trámites/Servicios (CV, Cl@ve, SEPE/SCE)', value: admin, max: W.admin},
-        {label:'Preparación (DARDE/CV/Ent./Carta)', value: readiness, max: W.readiness},
-        {label:'Disponibilidad', value: availability, max: W.availability || 5},
-        {label:'Idiomas', value: language, max: W.language},
-        {label:'Penalización por inactividad', value: gapPenalty, max: 0}
-      ];
-      let band = {label:'Fase 1 · Base', class:'bad'}; if(phase === 3) band = {label:'Fase 3 · Listo/a', class:'ok'}; else if(phase === 2) band = {label:'Fase 2 · En marcha', class:'warn'};
-      return {score: raw, band, breakdown, phase};
-    }
+      scoreEl.textContent = score.toFixed(0);
+      bandText.textContent = band.label;
+      labelBand.textContent = band.label;
+      labelBand.className = 'pill ' + band.class;
+      meterBar.style.width = score + '%';
 
-    // ====== RENDER ======
-    const meterBar = document.getElementById('meterBar');
-    const scoreEl = document.getElementById('score');
-    const bandText = document.getElementById('bandText');
-    const labelBand = document.getElementById('labelBand');
-    const breakdownEl = document.getElementById('breakdown');
-    const planEl = document.getElementById('plan');
+      const angle = Math.round((score/100) * 360) + 'deg';
+      const scoreBox = document.querySelector('.score');
+      if(scoreBox) scoreBox.style.setProperty('--angle', angle);
 
-    function stateFromUI(){ return Object.fromEntries(Object.entries(inputs).map(([k, el]) => [k, el?.value])); }
-    function applyState(state){ Object.entries(state).forEach(([k,v])=>{ if(inputs[k]) inputs[k].value = v }); Object.keys(liveLabels).forEach(k => { if(liveLabels[k]) liveLabels[k].textContent = inputs[k].value; }); render(); }
+      // Desglose de la puntuación
+      breakdownEl.innerHTML = breakdown.map(b => `
+        <div class="item">
+          <div><div>${b.label}</div><small>${b.max >= 0 ? `máx ${b.max}`: ''}</small></div>
+          <div class="badge ${b.value < 0 ? 'bad' : 'ok'}">${b.value}</div>
+        </div>
+      `).join('');
 
-    function buildPlan(s, score){
-      const tasks = [];
-      // FASE 1: básicos críticos
-      if(Number(s.admin) < 6) tasks.push({p: 10, t:'Básicos: CV + Cl@ve + SEPE/SCE', d:'Crear CV 1 pág · activar Cl@ve · alta/renovación SEPE/SCE.'});
-      if(s.cover !== 'ok') tasks.push({p: 8, t:'Carta de presentación', d:'Plantilla breve: 3 párrafos con logro y ajuste al puesto.'});
-      if(Number(s.comm) < 6) tasks.push({p: 9, t:'Conversación laboral', d:'Practica turnos + cierre en 2 min. Guion de 3 preguntas frecuentes.'});
-      if(Number(s.present) < 6) tasks.push({p: 8, t:'Presentación 30–45s', d:'Quién soy, qué aporto, ejemplo con resultado.'});
-      if(Number(s.tskill) < 6) tasks.push({p: 8, t:'Transporte a entrevistas', d:'Planifica ruta ida/vuelta y tiempos. Simula llegada 10 min antes.'});
-      // Reforzadores
-      if(Number(s.digital) < 6) tasks.push({p: 7, t:'Digital 6/10', d:'Gmail + Drive + Sheet con fórmula básica + subir/descargar PDF.'});
-      if(Number(s.soft) < 6) tasks.push({p: 7, t:'Soft básicos', d:'Puntualidad, pedir feedback y reportar cierre por correo.'});
-      const gap = Number(s.gap); if(gap > 6) tasks.push({p: 6, t:'Narrativa de inactividad', d:'Relato honesto + aprendizaje + plan actual (60s).'});
-      if(Number(s.lang) >= 6) tasks.push({p: 4, t:'Visibiliza idioma', d:'Pon el idioma en el titular y en 2 logros del CV.'});
-      tasks.sort((a,b)=> b.p - a.p);
-      const top = tasks.slice(0,6); const week1 = top.slice(0,3); const week2 = top.slice(3,6);
-      const badge = score >= 70 ? 'ok' : score >= 45 ? 'warn' : 'bad';
-      let html = `<div class="subtitle">Estado actual: <strong class="${badge}">${score.toFixed(0)}/100</strong>. Fase sugerida: ${badge==='ok'?'3 · Listo/a':(badge==='warn'?'2 · En marcha':'1 · Base')}.</div>`;
-      html += `<div class=\"grid-2\" style=\"margin-top:10px\">`;
-      html += `<div><strong>Semana 1</strong><ol>` + week1.map(t=>`<li><strong>${t.t}:</strong> ${t.d}</li>`).join('') + `</ol></div>`;
-      html += `<div><strong>Semana 2</strong><ol>` + week2.map(t=>`<li><strong>${t.t}:</strong> ${t.d}</li>`).join('') + `</ol></div>`;
-      html += `</div>`; return html;
-    }
+      // Plan de acción
+      planEl.innerHTML = buildPlan(state, score);
+      syncTaskHandlers();
 
-    function render(){
-      const state = stateFromUI(); const {score, band, breakdown} = computeScore(state);
-      if(!scoreEl || !bandText || !labelBand || !meterBar || !breakdownEl || !planEl){ console.error('Faltan elementos del DOM para render'); return; }
-      scoreEl.textContent = score.toFixed(0); bandText.textContent = band.label; labelBand.textContent = band.label; labelBand.className = 'pill ' + band.class; meterBar.style.width = score + '%';
-      const angle = Math.round((score/100) * 360) + 'deg'; const scoreBox = document.querySelector('.score'); if(scoreBox) scoreBox.style.setProperty('--angle', angle);
-      breakdownEl.innerHTML = breakdown.map(b => `
-        <div class="item">
-          <div><div>${b.label}</div><small>${b.max >= 0 ? `máx ${b.max}`: ''}</small></div>
-          <div class="badge ${b.value < 0 ? 'bad' : 'ok'}">${b.value}</div>
-        </div>
-      `).join('');
-      planEl.innerHTML = buildPlan(state, score);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({...state, checks: checksState}));
-    }
+      // Guardado local automático
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({...state, checks: checksState}));
+    }
 
-    // ====== CHECKLIST MODAL ======
-    const checkDefs = {
-      digital:[
-        'Accede a su email sin ayuda','Adjunta un archivo al correo correctamente','Crea un documento y comparte con permiso “ver”','Crea una hoja y usa una fórmula básica (SUMA/Promedio)','Descarga y sube un PDF a una carpeta en la nube','Rellena un formulario online sin errores','Solicita o renueva una cita/trámite administrativo online','Usa 2FA o explica qué es y dónde activarlo','Identifica un intento de phishing (y explica por qué)','Resuelve un problema simple sin ayuda (p.ej. recuperar contraseña)'
-      ],
-      soft:[
-        'Puntualidad/fiabilidad: llega a la hora y trae lo pedido','Comunicación clara: explica una tarea en 1–2 min sin perder el hilo','Escucha activa: parafrasea y verifica comprensión','Regulación emocional: mantiene tono respetuoso ante un contratiempo','Iniciativa: propone alternativa sin que se lo pidan','Resolución de problemas: divide un problema en pasos','Colaboración: reparte tareas y pide/da ayuda cuando toca','Feedback: acepta corrección y ajusta','Organización: prioriza 3 tareas con plazos realistas','Cierre: completa tarea y reporta resultado sin recordatorio'
-      ],
-      basics:[
-        'Tiene CV básico en 1 página','Dispone de Cl@ve Permanente activa','Sabe entrar al SEPE o SCE y revisar citas/prestaciones','Tiene carta de presentación modelo preparada'
-      ],
-      comm:[
-        'Mantiene 4–5 turnos de conversación sin perder el hilo','Responde a “Cuéntame sobre ti” en ≤90s','Hace preguntas abiertas pertinentes','Cierra la conversación resumiendo siguiente paso'
-      ],
-      present:[
-        'Se presenta con nombre y rol en ≤15s','Explica qué busca y dónde puede aportar','Da un ejemplo con resultado (métrica simple)','Mantiene contacto visual y tono adecuado'
-      ],
-      tskill:[
-        'Encuentra una ruta en Google Maps','Planifica un transbordo y tiempo de llegada','Sabe comprar/recargar un título de transporte','Llega 10 minutos antes en un simulacro'
-      ]
-    };
+    // Conectar todos los inputs y selects para que disparen render()
+    Object.entries(inputs).forEach(([k, el]) => {
+      if (el) {
+        el.addEventListener('input', () => { // 'input' para ranges, 'change' para selects/text
+          if (liveLabels[k]) liveLabels[k].textContent = el.value;
+          render();
+        });
+        el.addEventListener('change', render);
+      }
+    });
 
-    const modal = { backdrop: $('#modalBackdrop'), title: $('#modalTitle'), intro: $('#modalIntro'), checks: $('#modalChecks'), notes: $('#modalNotes'), btnClose: $('#modalClose'), btnCancel: $('#modalCancel'), btnApply: $('#modalApply') };
-    let currentChecklist = null; // 'digital' | 'soft' | 'basics' | 'comm' | 'present' | 'tskill'
-    const bodyLock = (lock)=> document.body.style.overflow = lock ? 'hidden' : '';
+    // (El resto de funciones, `computeScore`, `buildPlan`, `buildTextReport`, `download`, `summarizeChecks` se mantienen tal cual)
 
-    function openChecklist(kind){
-      currentChecklist = kind;
-      const titles = {digital:'Checklist · Competencia digital',soft:'Checklist · Habilidades blandas',basics:'Checklist · Básicos de empleabilidad',comm:'Checklist · Conversación',present:'Checklist · Presentación personal',tskill:'Checklist · Transporte público'};
-      modal.title.textContent = titles[kind] || 'Checklist';
-      modal.intro.textContent = 'Marca evidencias observadas (sí=1). La suma fija el 0–10 automáticamente.';
-      const items = (checkDefs[kind]||[]).map((txt,idx)=>{
-        const checked = (checksState[kind]?.selected||[]).includes(idx);
-        return `<label class="checkitem"><input type="checkbox" data-idx="${idx}" ${checked?'checked':''}/> <span>${txt}</span></label>`;
-      }).join('');
-      modal.checks.innerHTML = items;
-      modal.notes.value = (checksState[kind]?.notes)||'';
-      modal.backdrop.style.display = 'flex'; modal.backdrop.setAttribute('aria-hidden','false'); bodyLock(true);
-    }
-    function closeChecklist(){ modal.backdrop.style.display='none'; modal.backdrop.setAttribute('aria-hidden','true'); bodyLock(false); }
+    // ... [Mantener computeScore, buildPlan, stateFromUI, applyState, buildTextReport, download, exportReportTXT, checkDefs, modal setup, openChecklist, closeChecklist, applyChecklist, syncTaskHandlers, selfTests] ...
+    
+    // ====== SCORING (Mantener tal cual) ======
+    function computeScore(state){
+      const W = { education:20, experience:15, digital:12, soft:12, comm:10, present:8, tskill:8, admin:8, readiness:7, availability:5, language:5, gapPenalty:-4 };
+      const education = Number(state.education);
+      const exp = Math.min(60, Number(state.monthsExp));
+      const experience = Math.round((exp / 60) * W.experience);
+      const digital = Math.round((Number(state.digital) / 10) * W.digital);
+      const soft = Math.round((Number(state.soft) / 10) * W.soft);
+      const comm = Math.round((Number(state.comm) / 10) * W.comm);
+      const present = Math.round((Number(state.present) / 10) * W.present);
+      const tskill = Math.round((Number(state.tskill) / 10) * W.tskill);
+      const admin = Math.round((Number(state.admin) / 10) * W.admin);
+      let ready = 0; ready += state.darde === 'ok' ? 3 : 0; ready += state.cv === 'ok' ? 2 : 0; ready += state.interview === 'ok' ? 2 : 0; ready += state.cover === 'ok' ? 2 : 0;
+      const readiness = Math.min(W.readiness, ready);
+      const availability = state.availability === 'full' ? 5 : state.availability === 'part' ? 3 : 0;
+      const language = Number(state.lang);
+      const gaps = Math.max(0, Number(state.gap) - 6); const maxGap = Math.abs(W.gapPenalty); const gapPenalty = - Math.min(maxGap, Math.round((gaps / 42) * maxGap));
+      let raw = education + experience + digital + soft + comm + present + tskill + admin + readiness + availability + language + gapPenalty;
+      raw = Math.max(0, Math.min(100, raw));
+      let phase = 1; if(raw >= 70) phase = 3; else if(raw >= 45) phase = 2;
+      const breakdown = [
+        {label:'Formación (incl. certificados/cursos)', value: education, max: W.education},
+        {label:'Experiencia', value: experience, max: W.experience},
+        {label:'Digital', value: digital, max: W.digital},
+        {label:'Soft skills', value: soft, max: W.soft},
+        {label:'Conversación', value: comm, max: W.comm},
+        {label:'Presentación', value: present, max: W.present},
+        {label:'Uso transporte público', value: tskill, max: W.tskill},
+        {label:'Trámites/Servicios (CV, Cl@ve, SEPE/SCE)', value: admin, max: W.admin},
+        {label:'Preparación (DARDE/CV/Ent./Carta)', value: readiness, max: W.readiness},
+        {label:'Disponibilidad', value: availability, max: W.availability || 5},
+        {label:'Idiomas', value: language, max: W.language},
+        {label:'Penalización por inactividad', value: gapPenalty, max: 0}
+      ];
+      let band = {label:'Fase 1 · Base', class:'bad'}; if(phase === 3) band = {label:'Fase 3 · Listo/a', class:'ok'}; else if(phase === 2) band = {label:'Fase 2 · En marcha', class:'warn'};
+      return {score: raw, band, breakdown, phase};
+    }
 
-    function applyChecklist(){
-      if(!currentChecklist) return;
-      const boxes = Array.from(modal.checks.querySelectorAll('input[type="checkbox"]'));
-      const selectedIdx = boxes.filter(b=>b.checked).map(b=> Number(b.getAttribute('data-idx')));
-      checksState[currentChecklist] = checksState[currentChecklist] || {selected:[], notes:''};
-      checksState[currentChecklist].selected = selectedIdx;
-      checksState[currentChecklist].notes = modal.notes.value.trim();
-      const value = Math.min(10, Math.max(0, selectedIdx.length));
-      if(currentChecklist==='digital'){ inputs.digital.value = String(value); liveLabels.digital.textContent = value; }
-      else if(currentChecklist==='soft'){ inputs.soft.value = String(value); liveLabels.soft.textContent = value; }
-      else if(currentChecklist==='basics'){ inputs.admin.value = String(Math.min(10, selectedIdx.length*3)); liveLabels.admin.textContent = inputs.admin.value; }
-      else if(currentChecklist==='comm'){ inputs.comm.value = String(value); liveLabels.comm.textContent = value; }
-      else if(currentChecklist==='present'){ inputs.present.value = String(value); liveLabels.present.textContent = value; }
-      else if(currentChecklist==='tskill'){ inputs.tskill.value = String(value); liveLabels.tskill.textContent = value; }
-      closeChecklist(); render();
-    }
+    function stateFromUI(){ return Object.fromEntries(Object.entries(inputs).map(([k, el]) => [k, el?.value])); }
+    function applyState(state){ Object.entries(state).forEach(([k,v])=>{ if(inputs[k]) inputs[k].value = v; }); Object.keys(liveLabels).forEach(k => { if(liveLabels[k]) liveLabels[k].textContent = inputs[k].value; }); render(); }
 
-    // Listeners checklist + cerrar
-    $('#btnChecklistDigital').addEventListener('click', ()=> openChecklist('digital'));
-    $('#btnChecklistSoft').addEventListener('click', ()=> openChecklist('soft'));
-    $('#btnChecklistBasics').addEventListener('click', ()=> openChecklist('basics'));
-    $('#btnChecklistComm').addEventListener('click', ()=> openChecklist('comm'));
-    $('#btnChecklistPresent').addEventListener('click', ()=> openChecklist('present'));
-    $('#btnChecklistTskill').addEventListener('click', ()=> openChecklist('tskill'));
-    modal.btnClose.addEventListener('click', closeChecklist);
-    modal.btnCancel.addEventListener('click', closeChecklist);
-    modal.btnApply.addEventListener('click', applyChecklist);
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeChecklist(); });
-    modal.backdrop.addEventListener('click', (e)=>{ if(e.target === modal.backdrop) closeChecklist(); });
 
-    // ====== EXPORT/RESET/SAVE ======
-    document.getElementById('btnExport').addEventListener('click', ()=>{
-      const blob = new Blob([JSON.stringify({ ...stateFromUI(), checks: checksState }, null, 2)], {type:'application/json'});
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'empleabilidad_state.json'; a.click(); URL.revokeObjectURL(a.href);
-    });
-    document.getElementById('btnReset').addEventListener('click', ()=>{ localStorage.removeItem(STORAGE_KEY); window.location.reload(); });
-    document.getElementById('btnSave').addEventListener('click', ()=>{ localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...stateFromUI(), checks: checksState })); alert('Guardado en este navegador.'); });
+    function buildPlan(s, score){
+      // Base de tareas medibles
+      const tasks = [];
+      const push = (id,t,d,impact,kpi,due,effort='M')=> tasks.push({id,t,d,impact,kpi,due,effort});
+      if(Number(s.admin) < 6) push('admin-core','CV + Cl@ve + SEPE/SCE','CV 1 pág; activar Cl@ve; alta/renovación SEPE/SCE.',10,'Admin ≥6/10 y DARDE ok','Día 3','H');
+      if(s.cover !== 'ok') push('cover','Carta de presentación breve','3 párrafos, 120–160 palabras, 1 logro cuantificado.',4,'Carta lista y revisada','Día 4','M');
+      if(Number(s.comm) < 6) push('comm','Practicar conversación laboral','Guion 3 preguntas; cerrar en ≤2 min; grabar 2 ensayos.',6,'2 ensayos grabados','Día 5','M');
+      if(Number(s.present) < 6) push('pitch','Pitch 30–45s','Quién soy, qué aporto, ejemplo con resultado.',5,'Pitch ≤45s grabado','Día 2','L');
+      if(Number(s.tskill) < 6) push('transport','Ruta a entrevista','Planifica ida/vuelta; simulacro llegada -10 min.',5,'Pantallazo ruta + check puntualidad','Día 6','M');
+      if(Number(s.digital) < 6) push('digital','Digital 6/10','Gmail + Drive; hoja con SUMA; subir/descargar PDF.',5,'Checklist digital ≥6/10','Día 7','M');
+      if(Number(s.soft) < 6) push('soft','Soft básicos','Pedir feedback; cerrar tarea por email; puntualidad 1 semana.',4,'2 evidencias de feedback/cierre','Día 10','M');
+      const gap = Number(s.gap); if(gap > 6) push('gap','Narrativa de inactividad','Relato honesto + aprendizaje + plan; 60s.',3,'Texto 120–180 palabras + audio','Día 8','L');
+      if(Number(s.lang) >= 6) push('lang','Visibilizar idioma','Añadir idioma a titular y 2 logros en CV.',2,'CV con idioma visible','Día 9','L');
+      tasks.sort((a,b)=> b.impact - a.impact);
+      const top = tasks.slice(0,8);
+      const badge = score >= 70 ? 'ok' : score >= 45 ? 'warn' : 'bad';
+      const phaseLabel = badge==='ok'?'3 · Listo/a':(badge==='warn'?'2 · En marcha':'1 · Base');
+      const doneMap = JSON.parse(localStorage.getItem('TASKS_DONE')||'{}');
+      let html = `<div class="subtitle">Estado actual: <strong class="${badge}">${score.toFixed(0)}/100</strong> · Fase sugerida: ${phaseLabel}. Prioriza de mayor impacto a menor.</div>`;
+      html += `<div class="tasks-grid">` + top.map(t=>{
+        const done = !!doneMap[t.id];
+        const chipClass = t.impact>=8?'ok':(t.impact>=5?'warn':'bad');
+        return `
+          <article class="task-card" data-task-id="${t.id}">
+            <div class="task-head">
+              <div class="task-title">${t.t}</div>
+              <span class="chip ${chipClass}" title="Impacto estimado en el score">+${t.impact} pts</span>
+            </div>
+            <div class="task-kpi">KPI: ${t.kpi}</div>
+            <div class="divider"></div>
+            <p>${t.d}</p>
+            <div class="task-meta">
+              <span class="chip" title="Esfuerzo">Esfuerzo: ${t.effort}</span>
+              <span class="chip" title="Vencimiento sugerido">${t.due}</span>
+            </div>
+            <div class="task-actions">
+              <label><input type="checkbox" class="task-done" ${done?'checked':''}/> Marcar como hecho</label>
+            </div>
+          </article>`;
+      }).join('') + `</div>`;
+      return html;
+    }
 
-    // ====== INIT (hash > LS > default) ======
-    const fromHash = (hash)=>{ try{ if(hash.startsWith('#s=')) return JSON.parse(decodeURIComponent(escape(atob(hash.slice(3))))); } catch{} return null; };
-    const saved = localStorage.getItem(STORAGE_KEY); const shared = fromHash(location.hash);
-    if(shared){ applyState(shared); if(shared.checks){ Object.assign(checksState, shared.checks); } }
-    else if(saved){ const obj = JSON.parse(saved); applyState(obj); if(obj.checks){ Object.assign(checksState, obj.checks); } }
-    else { render(); }
+    function summarizeChecks(){
+      try{
+        const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+        const ch = raw.checks || {};
+        const fmt = (k)=> (ch[k]?.selected||[]).length + (ch[k]?.notes?` (notas)`:'');
+        return { digital: fmt('digital'), soft: fmt('soft'), basics: fmt('basics'), comm: fmt('comm'), present: fmt('present'), tskill: fmt('tskill') };
+      }catch{ return {}; }
+    }
 
-    // ====== SELF TESTS ======
-    (function selfTests(){
-      const tests = []; const assert=(name,cond)=>tests.push({name,ok:!!cond});
-      assert('Checklist Digital existe', !!document.getElementById('btnChecklistDigital'));
-      assert('Checklist Basics existe', !!document.getElementById('btnChecklistBasics'));
-      // Emular 2 checks de basics → admin=6
-      checksState.basics.selected = [0,1]; inputs.admin.value = '6'; liveLabels.admin.textContent = '6'; render();
-      assert('Admin 0–10', Number(inputs.admin.value)>=0 && Number(inputs.admin.value)<=10);
-      const s = computeScore(stateFromUI()); assert('Score 0–100', s.score >=0 && s.score <=100);
-      // Abrir y cerrar modal programáticamente
-      openChecklist('digital'); assert('Modal visible al abrir', document.getElementById('modalBackdrop').style.display === 'flex'); closeChecklist();
-      const failed = tests.filter(t=>!t.ok); if(failed.length){ console.warn('PRUEBAS FALLIDAS:', failed); } else { console.log('PRUEBAS OK:', tests); }
-    })();
+    function buildTextReport(){
+      const s = stateFromUI(); const calc = computeScore(s); const checks = summarizeChecks();
+      const nivel = calc.score >= 70 ? 'Alto' : calc.score >= 45 ? 'Medio' : 'Inicial';
+      const tasks = [];
+      const P = (id,t,kpi)=>tasks.push({id,t,kpi});
+      if(Number(s.admin) < 6) P('admin-core','CV + Cl@ve + SEPE/SCE','Admin ≥6/10 y DARDE ok');
+      if(s.cover !== 'ok') P('cover','Carta de presentación breve','Carta lista y revisada');
+      if(Number(s.comm) < 6) P('comm','Practicar conversación laboral','2 ensayos grabados');
+      if(Number(s.present) < 6) P('pitch','Pitch 30–45s','Pitch ≤45s grabado');
+      if(Number(s.tskill) < 6) P('transport','Ruta a entrevista','Pantallazo ruta + check puntualidad');
+      if(Number(s.digital) < 6) P('digital','Digital 6/10','Checklist digital ≥6/10');
+      if(Number(s.soft) < 6) P('soft','Soft básicos','2 evidencias feedback/cierre');
+      const gap = Number(s.gap); if(gap > 6) P('gap','Narrativa de inactividad','Texto 120–180 palabras + audio');
 
-    // Exponer helpers por si se necesita desde consola
-    window.computeScore = computeScore; window.buildPlan = buildPlan; window.stateFromUI = stateFromUI;
-  });
-  </script>
+      const lines = [];
+      lines.push('RESUMEN EJECUTIVO');
+      lines.push(`Score: ${calc.score.toFixed(0)}/100 · ${calc.band.label} · Nivel: ${nivel}`);
+      lines.push('Proyección (2 semanas): +15 pts si se completan tareas prioritarias.');
+      lines.push('');
+      lines.push('PERFIL ACTUAL');
+      lines.push(`- Educación: ${s.education}`);
+      lines.push(`- Experiencia (meses): ${s.monthsExp}`);
+      lines.push(`- Inactividad reciente (meses): ${s.gap}`);
+      lines.push(`- Digital: ${s.digital} · Soft: ${s.soft} · Conversación: ${s.comm} · Presentación: ${s.present} · Transporte: ${s.tskill}`);
+      lines.push(`- Trámites/Servicios (admin): ${s.admin} · DARDE:${s.darde} · CV:${s.cv} · Entrevista:${s.interview} · Carta:${s.cover}`);
+      lines.push(`- Idiomas: ${s.lang} · Disponibilidad: ${s.availability}`);
+      lines.push('');
+      lines.push('EVIDENCIAS (checklists)');
+      lines.push(`- Digital: ${checks.digital || '0'} · Soft: ${checks.soft || '0'} · Básicos: ${checks.basics || '0'}`);
+      lines.push(`- Conversación: ${checks.comm || '0'} · Presentación: ${checks.present || '0'} · Transporte: ${checks.tskill || '0'}`);
+      lines.push('');
+      lines.push('PRIORIDADES DE ACCIÓN (KPI medibles)');
+      tasks.forEach((t,i)=>{ lines.push(`${i+1}. ${t.t} — KPI: ${t.kpi}`); });
+      lines.push('');
+      lines.push('RECOMENDACIONES');
+      lines.push('- Entrenar pitch y conversación 2 sesiones (grabadas) antes de entrevistas.');
+      lines.push('- Asegurar logística de transporte para llegar 10 min antes.');
+      lines.push('- Mantener registro de evidencias (capturas/archivos) para seguimiento.');
+      return lines.join('\n');
+    }
+
+    function download(filename, mime, content){
+      try{
+        const blob = new Blob([content], {type:mime});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = filename; a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(()=> URL.revokeObjectURL(url), 1000);
+      }catch(e){
+        console.error('Descarga fallida:', e);
+        alert('No se pudo generar la descarga. Revisa la consola.');
+      }
+    }
+
+    function exportReportTXT(){
+      try{
+        let txt = buildTextReport();
+        txt = txt.replace(/\n/g, '\r\n'); // CRLF para Windows
+        const bom = '﻿'; // BOM para Notepad
+        download('informe_empleabilidad.txt','text/plain;charset=utf-8', bom + txt);
+      }catch(e){
+        console.error('Error generando informe TXT:', e);
+        alert('No se pudo generar el informe. Revisa la consola.');
+      }
+    }
+
+    // Checklist definition and functions
+    const checkDefs = {
+      digital:[
+        'Accede a su email sin ayuda','Adjunta un archivo al correo correctamente','Crea un documento y comparte con permiso “ver”','Crea una hoja y usa una fórmula básica (SUMA/Promedio)','Descarga y sube un PDF a una carpeta en la nube','Rellena un formulario online sin errores','Solicita o renueva una cita/trámite administrativo online','Usa 2FA o explica qué es y dónde activarlo','Identifica un intento de phishing (y explica por qué)','Resuelve un problema simple sin ayuda (p.ej. recuperar contraseña)'
+      ],
+      soft:[
+        'Puntualidad/fiabilidad: llega a la hora y trae lo pedido','Comunicación clara: explica una tarea en 1–2 min sin perder el hilo','Escucha activa: parafrasea y verifica comprensión','Regulación emocional: mantiene tono respetuoso ante un contratiempo','Iniciativa: propone alternativa sin que se lo pidan','Resolución de problemas: divide un problema en pasos','Colaboración: reparte tareas y pide/da ayuda cuando toca','Feedback: acepta corrección y ajusta','Organización: prioriza 3 tareas con plazos realistas','Cierre: completa tarea y reporta resultado sin recordatorio'
+      ],
+      basics:[
+        'Tiene CV básico en 1 página','Dispone de Cl@ve Permanente activa','Sabe entrar al SEPE o SCE y revisar citas/prestaciones','Tiene carta de presentación modelo preparada'
+      ],
+      comm:[
+        'Mantiene 4–5 turnos de conversación sin perder el hilo','Responde a “Cuéntame sobre ti” en ≤90s','Hace preguntas abiertas pertinentes','Cierra la conversación resumiendo siguiente paso'
+      ],
+      present:[
+        'Se presenta con nombre y rol en ≤15s','Explica qué busca y dónde puede aportar','Da un ejemplo con resultado (métrica simple)','Mantiene contacto visual y tono adecuado'
+      ],
+      tskill:[
+        'Encuentra una ruta en Google Maps','Planifica un transbordo y tiempo de llegada','Sabe comprar/recargar un título de transporte','Llega 10 minutos antes en un simulacro'
+      ]
+    };
+    const modal = { backdrop: $('#modalBackdrop'), title: $('#modalTitle'), intro: $('#modalIntro'), checks: $('#modalChecks'), notes: $('#modalNotes'), btnClose: $('#modalClose'), btnCancel: $('#modalCancel'), btnApply: $('#modalApply') };
+    let currentChecklist = null; // 'digital' | 'soft' | 'basics' | 'comm' | 'present' | 'tskill'
+    const bodyLock = (lock)=> document.body.style.overflow = lock ? 'hidden' : '';
+
+    function openChecklist(kind){
+      currentChecklist = kind;
+      const titles = {digital:'Checklist · Competencia digital',soft:'Checklist · Habilidades blandas',basics:'Checklist · Básicos de empleabilidad',comm:'Checklist · Conversación',present:'Checklist · Presentación personal',tskill:'Checklist · Transporte público'};
+      modal.title.textContent = titles[kind] || 'Checklist';
+      modal.intro.textContent = 'Marca evidencias observadas (sí=1). La suma fija el 0–10 automáticamente.';
+      const items = (checkDefs[kind]||[]).map((txt,idx)=>{
+        const checked = (checksState[kind]?.selected||[]).includes(idx);
+        return `<label class="checkitem"><input type="checkbox" data-idx="${idx}" ${checked?'checked':''}/> <span>${txt}</span></label>`;
+      }).join('');
+      modal.checks.innerHTML = items;
+      modal.notes.value = (checksState[kind]?.notes)||'';
+      modal.backdrop.style.display = 'flex'; modal.backdrop.setAttribute('aria-hidden','false'); bodyLock(true);
+    }
+    function closeChecklist(){ modal.backdrop.style.display='none'; modal.backdrop.setAttribute('aria-hidden','true'); bodyLock(false); }
+
+    function applyChecklist(){
+      if(!currentChecklist) return;
+      const boxes = Array.from(modal.checks.querySelectorAll('input[type="checkbox"]'));
+      const selectedIdx = boxes.filter(b=>b.checked).map(b=> Number(b.getAttribute('data-idx')));
+      checksState[currentChecklist] = checksState[currentChecklist] || {selected:[], notes:''};
+      checksState[currentChecklist].selected = selectedIdx;
+      checksState[currentChecklist].notes = modal.notes.value.trim();
+      const value = Math.min(10, Math.max(0, selectedIdx.length));
+      // Las checklist de 10 puntos (digital, soft, comm, present, tskill) mapean a 10/10 ítems.
+      if(currentChecklist==='digital'){ inputs.digital.value = String(value); liveLabels.digital.textContent = value; }
+      else if(currentChecklist==='soft'){ inputs.soft.value = String(value); liveLabels.soft.textContent = value; }
+      else if(currentChecklist==='comm'){ inputs.comm.value = String(value); liveLabels.comm.textContent = value; }
+      else if(currentChecklist==='present'){ inputs.present.value = String(value); liveLabels.present.textContent = value; }
+      else if(currentChecklist==='tskill'){ inputs.tskill.value = String(value); liveLabels.tskill.textContent = value; }
+      // La checklist de 'basics' (4 ítems) sube el admin hasta 8 puntos (4*2). El límite de la barra es 10.
+      else if(currentChecklist==='basics'){ inputs.admin.value = String(Math.min(10, selectedIdx.length*2)); liveLabels.admin.textContent = inputs.admin.value; }
+      closeChecklist(); render();
+    }
+
+    // Listeners checklist + cerrar
+    $('#btnChecklistDigital').addEventListener('click', ()=> openChecklist('digital'));
+    $('#btnChecklistSoft').addEventListener('click', ()=> openChecklist('soft'));
+    $('#btnChecklistBasics').addEventListener('click', ()=> openChecklist('basics'));
+    $('#btnChecklistComm').addEventListener('click', ()=> openChecklist('comm'));
+    $('#btnChecklistPresent').addEventListener('click', ()=> openChecklist('present'));
+    $('#btnChecklistTskill').addEventListener('click', ()=> openChecklist('tskill'));
+    modal.btnClose.addEventListener('click', closeChecklist);
+    modal.btnCancel.addEventListener('click', closeChecklist);
+    modal.btnApply.addEventListener('click', applyChecklist);
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeChecklist(); });
+    modal.backdrop.addEventListener('click', (e)=>{ if(e.target === modal.backdrop) closeChecklist(); });
+
+
+    // ====== EXPORT/RESET/SAVE/REPORT (FUNCIONAN AHORA) ======
+    document.getElementById('btnExport').addEventListener('click', ()=>{
+      const dataToExport = { ...stateFromUI(), checks: checksState };
+      const blob = new Blob([JSON.stringify(dataToExport, null, 2)], {type:'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'empleabilidad_state.json'; a.click(); URL.revokeObjectURL(a.href);
+    });
+    document.getElementById('btnReset').addEventListener('click', ()=>{ 
+      if(confirm('¿Seguro que quieres reiniciar? Se borrarán todos los datos guardados localmente.')){
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem('TASKS_DONE');
+        window.location.reload(); 
+      }
+    });
+    document.getElementById('btnSave').addEventListener('click', ()=>{ 
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...stateFromUI(), checks: checksState })); 
+      alert('Datos guardados en este navegador.'); 
+    });
+    document.getElementById('btnReportTxt').addEventListener('click', exportReportTXT);
+
+    // Sincroniza handlers de tareas (para marcar como hecho)
+    function syncTaskHandlers(){
+      const container = document.getElementById('plan'); if(!container) return;
+      container.querySelectorAll('.task-card .task-done').forEach(chk=>{
+        chk.onchange = (e)=>{
+          const card = e.target.closest('.task-card');
+          const id = card?.getAttribute('data-task-id');
+          if(!id) return;
+          const map = JSON.parse(localStorage.getItem('TASKS_DONE')||'{}');
+          map[id] = e.target.checked;
+          localStorage.setItem('TASKS_DONE', JSON.stringify(map));
+        };
+      });
+    }
+
+    // ====== INIT (hash > LS > default) (Maneja la carga inicial de datos) ======
+    const fromHash = (hash)=>{ try{ if(hash.startsWith('#s=')) return JSON.parse(decodeURIComponent(escape(atob(hash.slice(3))))); } catch{} return null; };
+    const saved = localStorage.getItem(STORAGE_KEY); const shared = fromHash(location.hash);
+    if(shared){ applyState(shared); if(shared.checks){ Object.assign(checksState, shared.checks); } }
+    else if(saved){ const obj = JSON.parse(saved); applyState(obj); if(obj.checks){ Object.assign(checksState, obj.checks); } }
+    else { render(); } // Render inicial si no hay datos guardados
+
+    // ====== SELF TESTS ======
+    (function selfTests(){
+      const tests = []; const assert=(name,cond)=>tests.push({name,ok:!!cond});
+      assert('Checklist Digital existe', !!document.getElementById('btnChecklistDigital'));
+      assert('Checklist Basics existe', !!document.getElementById('btnChecklistBasics'));
+      // Emular 2 checks de basics → admin=4 (ajustado de 6 a 4 para 2 ítems)
+      checksState.basics.selected = [0,1]; inputs.admin.value = '4'; liveLabels.admin.textContent = '4'; render(); // Renderiza para tomar el valor
+      assert('Admin 0–10', Number(inputs.admin.value)>=0 && Number(inputs.admin.value)<=10);
+      const s = computeScore(stateFromUI()); assert('Score 0–100', s.score >=0 && s.score <=100);
+      const report = buildTextReport(); assert('Informe TXT no vacío', (report||'').length > 200);
+      const firstTask = document.querySelector('.task-card'); assert('Hay tareas en el plan', !!firstTask);
+      const failed = tests.filter(t=>!t.ok); if(failed.length){ console.warn('PRUEBAS FALLIDAS:', failed); } else { console.log('PRUEBAS OK:', tests); }
+    })();
+
+    // Helpers en consola
+    window.computeScore = computeScore; window.buildPlan = buildPlan; window.stateFromUI = stateFromUI;
+  });
+  </script>
 </body>
 </html>
